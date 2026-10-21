@@ -76,7 +76,7 @@ Réponses possibles :
 | « Google a accès à cette URL » | la page est lisible et indexable |
 | « Indexation demandée … file d'attente d'exploration prioritaire » | c'est fait ; renvoyer la même URL ne change rien |
 | « Un problème est survenu. Si le problème persiste, réessayez dans quelques heures » | sur **une seule page, à chaque fois** : la page (poids, rendu). Tester une page légère pour trancher |
-| un message de quota (libellé exact non relevé) | environ 10 demandes par jour et par propriété ; attendre le lendemain |
+| « Quota dépassé. Désolé, nous n'avons pas pu traiter cette demande, car vous avez dépassé votre quota quotidien » | attendre le lendemain. Constaté **dès la 4ᵉ demande** sur une propriété, un jour où une autre propriété du même compte en avait déjà reçu : le quota semble compter au moins en partie par compte. Faire passer les pages les plus importantes en premier ; `gsc-batch.js` s'arrête au premier refus |
 
 ### Ce qu'on ne peut pas faire
 

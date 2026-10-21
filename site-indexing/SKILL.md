@@ -183,6 +183,19 @@ soit.
     Projects), puis laisser l'utilisateur choisir : passer en Pro, attendre la fin de la
     période, ou héberger ailleurs.
 
+18. **Un canonical hérité qui fait de chaque page un doublon de l'accueil.** Sous Next.js, un
+    `alternates: { canonical: "/" }` dans le layout racine s'applique à **toute** page qui ne
+    le redéfinit pas. Une page `"use client"` ne peut pas exporter `metadata`, et un fichier
+    `metadata.ts` posé à côté n'est lu par personne : chaque outil d'un second site portait le
+    titre de l'accueil et le désignait comme sa version canonique. Résultat : 11 pages sur 12
+    « explorées, actuellement non indexées ». Lancer `seo_check.py page` sur **plusieurs**
+    pages et comparer titre et canonical d'une page à l'autre : identiques, c'est ça. Le
+    remède : un `layout.tsx` par page cliente, qui exporte ses métadonnées.
+19. **Croire qu'un `Disallow` du groupe `User-agent: *` vaut pour Google.** Un robot
+    n'applique **que** le groupe qui le nomme : un groupe `User-agent: Googlebot` réduit à
+    `Allow: /` annule pour lui tous les `Disallow` du groupe général. Lire le `robots.txt` en
+    entier avant de conclure à un blocage (ou à son absence).
+
 ## Ce que ce skill ne fait pas
 
 - Il n'écrit pas de contenu « pour le SEO ». Si des pages sont trop maigres, on les retire de
