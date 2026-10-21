@@ -21,6 +21,21 @@ Toujours travailler dans ce dossier, jamais dans `~/.claude/skills` : ce n'est 
 
 Lire son `README.md` pour la liste des skills et ce que fait chacun.
 
+Si ce n'est pas un lien (skills installés par copie) ou que le dossier n'existe pas, le dépôt
+n'est pas cloné sur cette machine : suivre `INSTALL.md` du dépôt GitHub
+`pedrokarim/custom-skills` avant toute modification.
+
+## Installer ailleurs
+
+Sur une autre machine, ou dans un projet, il suffit de donner cette phrase à l'agent :
+
+```
+Installe les skills de https://github.com/pedrokarim/custom-skills en suivant https://raw.githubusercontent.com/pedrokarim/custom-skills/main/INSTALL.md
+```
+
+`INSTALL.md` est générique : il découvre les skills par leurs dossiers. Un nouveau skill n'y
+demande aucune modification.
+
 ## Ajouter un skill
 
 1. **Partir d'un procédé qui a marché**, pas d'une idée. Un skill écrit avant d'avoir réussi

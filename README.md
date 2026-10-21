@@ -16,19 +16,41 @@ quand s’en servir, comment, pourquoi chaque étape existe, et les erreurs déj
 
 ## Installation
 
-```powershell
-git clone https://github.com/pedrokarim/custom-skills.git
-cd custom-skills
-./install.ps1
+### En une phrase, par votre agent
+
+Coller ceci dans Claude Code, Codex ou tout autre agent de code :
+
+```
+Installe les skills de https://github.com/pedrokarim/custom-skills en suivant https://raw.githubusercontent.com/pedrokarim/custom-skills/main/INSTALL.md
 ```
 
-Le script relie chaque skill dans `~/.claude/skills` (Claude Code) et `~/.agents/skills`
-(Codex). Ce sont des **jonctions**, pas des copies : un skill modifié dans le dépôt est à jour
-partout, immédiatement. On le relance après avoir ajouté, renommé ou supprimé un skill ; il
-vérifie aussi l’en-tête de chaque `SKILL.md`.
+L’agent clone le dépôt, lance le bon script pour votre système, vérifie, puis vous dit comment
+appeler les skills. La phrase s’adapte :
 
-Sans PowerShell, la commande `npx skills add pedrokarim/custom-skills` installe les skills
-par copie.
+- « Installe **seulement le skill site-indexing** de … »
+- « Installe les skills de … **dans ce projet** » : copiés dans le projet, pour toute l’équipe.
+
+Ce que l’agent suit est dans [`INSTALL.md`](INSTALL.md).
+
+### À la main
+
+```sh
+git clone https://github.com/pedrokarim/custom-skills.git
+cd custom-skills
+./install.ps1        # Windows
+sh install.sh        # macOS, Linux
+```
+
+Ajouter des noms pour n’installer que certains skills : `./install.ps1 site-indexing`.
+
+Le script relie chaque skill dans `~/.claude/skills` (Claude Code) et `~/.agents/skills`
+(Codex). Ce sont des **liens**, pas des copies : un skill modifié dans le dépôt est à jour
+partout, immédiatement, et un `git pull` suffit pour récupérer les nouveautés. On le relance
+après avoir ajouté, renommé ou supprimé un skill ; il vérifie aussi l’en-tête de chaque
+`SKILL.md`.
+
+Pour les autres agents (Cursor, Gemini CLI…), `npx skills add pedrokarim/custom-skills`
+installe les skills par copie.
 
 ## S’en servir
 

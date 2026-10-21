@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Rend chaque skill du dépôt disponible dans tous les projets.
 
@@ -20,10 +20,17 @@
     ./install.ps1
 
 .EXAMPLE
+    ./install.ps1 site-indexing custom-skills
+
+.EXAMPLE
     ./install.ps1 -Targets "$HOME\.claude\skills"
 #>
-[CmdletBinding()]
+[CmdletBinding(PositionalBinding = $false)]
 param(
+    # Skills à installer ; tous par défaut. Noms séparés par des espaces ou des virgules.
+    [Parameter(Position = 0, ValueFromRemainingArguments = $true)]
+    [string[]] $Skills = @(),
+
     # Dossiers de skills à alimenter.
     [string[]] $Targets = @(
         (Join-Path $HOME '.claude\skills'),
@@ -41,11 +48,20 @@ function Write-Problem([string] $message) {
 }
 
 # Un skill = un sous-dossier qui contient un SKILL.md.
-$skills = @(Get-ChildItem -LiteralPath $repo -Directory |
+$available = @(Get-ChildItem -LiteralPath $repo -Directory |
     Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'SKILL.md') })
+$selected = $available
+# Lancé avec -File, « a,b » arrive en une seule chaîne.
+$Skills = @($Skills | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+if ($Skills.Count) {
+    $selected = @($available | Where-Object { $Skills -contains $_.Name })
+    foreach ($unknown in $Skills | Where-Object { $available.Name -notcontains $_ }) {
+        Write-Problem "$unknown : aucun skill de ce nom dans le dépôt"
+    }
+}
 
-Write-Host "Skills du dépôt ($($skills.Count))"
-foreach ($skill in $skills) {
+Write-Host "Skills du dépôt ($($selected.Count))"
+foreach ($skill in $selected) {
     $text = Get-Content -LiteralPath (Join-Path $skill.FullName 'SKILL.md') -Raw -Encoding utf8
     $frontMatter = [regex]::Match($text, '(?s)\A---\r?\n(.*?)\r?\n---')
     if (-not $frontMatter.Success) {
@@ -67,7 +83,7 @@ foreach ($target in $Targets) {
     Write-Host "`n$target"
     New-Item -ItemType Directory -Force -Path $target | Out-Null
 
-    foreach ($skill in $skills) {
+    foreach ($skill in $selected) {
         $link = Join-Path $target $skill.Name
         $existing = Get-Item -LiteralPath $link -Force -ErrorAction SilentlyContinue
         if (-not $existing) {
