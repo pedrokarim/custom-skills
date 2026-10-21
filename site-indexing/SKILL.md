@@ -43,6 +43,8 @@ est dans `references/brave-mcp-consoles.md`. Le lire avant la première action.
 
 ### 1. État des lieux, en lecture seule (≈ 15 min)
 
+0. **Vérifier que le site répond** : `scripts/seo_check.py page <accueil>` doit dire
+   `statut 200`. Sinon, tout le reste attend (voir le piège 17).
 1. **Demander ou retrouver les propriétés** avant de conclure quoi que ce soit. Une propriété
    « Domaine » (`sc-domain:exemple.com`) compte **tous les sous-domaines** : ses chiffres ne
    sont pas ceux du site. Lire la propriété « Préfixe de l'URL » du site lui-même.
@@ -173,6 +175,13 @@ soit.
     exact, pas sur un motif qui attraperait les URL de preview.
 16. **Vérifier en local une page qui dépend d'une base injoignable** : 500, temps perdu. Le test
     qui compte se fait de toute façon en production.
+17. **Auditer un site qui ne répond plus.** Un compte Vercel Hobby qui dépasse ses limites
+    (souvent le « Fluid Active CPU ») est mis en pause : **tous** ses projets répondent
+    `402 Payment Required`, `X-Vercel-Error: DEPLOYMENT_DISABLED`, y compris ceux qui n'ont
+    rien consommé. Un 4xx prolongé fait sortir les pages de l'index. Lire la cause et le projet
+    responsable dans `vercel.com/<équipe>/~/usage` (section du compteur dépassé, onglet
+    Projects), puis laisser l'utilisateur choisir : passer en Pro, attendre la fin de la
+    période, ou héberger ailleurs.
 
 ## Ce que ce skill ne fait pas
 
