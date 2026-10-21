@@ -96,6 +96,8 @@ async () => {
       continue;
     }
     results[url] = job.mode === "request" ? await runRequest(url) : await runTest(url);
+    // Quota épuisé : les URL suivantes échoueraient toutes de la même façon.
+    if (/quota/i.test(results[url])) break;
   }
   return results;
 }
