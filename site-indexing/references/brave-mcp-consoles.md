@@ -46,6 +46,14 @@ conclure qu'il n'y a pas de propriété, puis demander à l'utilisateur.
 | Liens | `/u/N/search-console/links?resource_id=<R>` |
 | Actions manuelles | `/u/N/search-console/manual-actions?resource_id=<R>` |
 | Suppressions | `/u/N/search-console/removals?resource_id=<R>` |
+| Statistiques d'exploration | `/u/N/search-console/settings/crawl-stats?resource_id=sc-domain%3A<domaine>` (propriété **Domaine** seulement), puis `&hostname=<hôte>` pour un sous-domaine (`/drilldown?…&host=` renvoie une erreur 400) |
+
+Le rapport « Indexation des pages » affiche sa date (« Dernière mise à jour : … ») : la
+lire avant de conclure. Sur DNA, le 24/10, il datait encore du 16/10, donc d'avant tous les
+correctifs ; l'inspection d'URL, elle, est à jour (date de dernière exploration).
+
+Les statistiques d'exploration servent à vérifier qu'un changement d'hébergement n'a pas
+servi d'erreurs à Googlebot : bloc « État de l'hôte » et répartition « Par réponse ».
 
 **L'inspection d'URL ne s'ouvre pas par adresse** : `/search-console/inspect?…&id=<url>`
 renvoie une 404. Passer par le champ de recherche en haut de page.
@@ -106,12 +114,14 @@ seulement. Bing reprend la vérification et les sitemaps, sans DNS ni balise.
 | Accueil (clics, impressions) | `https://www.bing.com/webmasters/home?siteUrl=<S>` |
 | Sitemaps | `/webmasters/sitemaps?siteUrl=<S>` |
 | IndexNow | `/webmasters/indexnow?siteUrl=<S>` (fenêtre des 15 dernières heures seulement) |
-| Explorateur de site | `/webmasters/siteexplorer?siteUrl=<S>` (plusieurs jours de retard) |
+| Performances (requêtes, pages, pays) | `/webmasters/searchperf?siteUrl=<S>` ; le tableau des mots-clés est lisible dans `innerText` |
+| Explorateur de site | `/webmasters/siteexplorer?siteUrl=<S>` (plusieurs jours de retard) ; le nombre de pages indexées est dans le libellé du graphique « Crawl information » (`Indexed:262, Error:0…`) |
 | Inspection d'URL | `/webmasters/urlinspection?siteUrl=<S>&urlToInspect=<URL encodée deux fois>` |
 
 Exemple d'URL encodée deux fois : `https%253A%252F%252Fexemple.com%252Fen`.
 
-Une adresse inconnue (`/webmasters/searchperf`) renvoie silencieusement à l'écran
+Le 24/10/2026, `searchperf` répondait bien avec `siteUrl=` écrit en clair : c'est une
+adresse **mal formée** qui renvoie silencieusement à l'écran
 d'accueil « Welcome » : ce n'est pas une déconnexion.
 
 ### Lire une inspection
