@@ -66,6 +66,29 @@ Pas de `lastmod` plutôt qu'un `lastmod` faux (horodatage de build ou `new Date(
 | Meta description trop longue | ≤ 160 caractères, dans chaque langue | Erreur dans Bing ; tronquée dans les résultats |
 | Bing et moteurs associés lents à découvrir | IndexNow (`scripts/indexnow.mjs`) | Prévient Bing, Yandex, Seznam, Naver ; DuckDuckGo, Ecosia, Yahoo et Qwant s'appuient sur Bing. Pas Google |
 
+## Liens entrants : vérifier avant de démarcher
+
+Un lien n'aide Google que s'il est sur une page **publique** qu'il explore. Un message Discord
+ne compte pas (serveurs privés, jamais explorés) : il amène des visiteurs, pas un signal.
+
+**Wikis Fandom** : tous leurs liens externes sont en `rel="nofollow"` (vérifié sur le wiki du
+jeu de DNA en octobre 2026). Google s'en sert au mieux pour découvrir des pages, pas pour
+classer le site. Avant de proposer un lien, mesurer l'activité du wiki par son API, depuis
+un onglet ouvert dessus (`fetch` vers `/api.php?format=json&origin=*&…`) :
+
+- `meta=siteinfo&siprop=statistics` : `activeusers` (contributeurs des 30 derniers jours) ;
+- `list=allusers&augroup=sysop|bureaucrat` puis `list=usercontribs&uclimit=1&ucuser=<nom>` :
+  date de la dernière contribution de chaque administrateur ;
+- `prop=info&inprop=protection&titles=<page d'accueil>` : l'accueil est souvent réservé aux
+  administrateurs ;
+- `list=exturlusage&euquery=<domaine>` : le wiki cite-t-il déjà des outils de fans ?
+- la page `<Wiki>:Wiki rules` : la règle Fandom par défaut interdit l'autopromotion et renvoie
+  vers un administrateur.
+
+Sur DNA : 3 contributeurs actifs, administrateurs muets depuis 7 mois, accueil protégé,
+aucun outil externe cité, liens `nofollow`. Gain pour Google à peu près nul : ne pas y passer
+de temps. Les guides Steam du jeu, publics et bien explorés, sont un meilleur candidat.
+
 ## Délais à connaître
 
 | Quoi | Délai observé |
