@@ -57,6 +57,10 @@ est dans `references/brave-mcp-consoles.md`. Le lire avant la première action.
      n'était pas revenu sur l'accueil depuis trois mois.
 3. Bing Webmaster Tools : accueil, Sitemaps, IndexNow, inspection d'URL de l'accueil.
 4. Les analytics du site : visites venues des moteurs, par référent.
+5. Si l'utilisateur apporte un **audit en ligne** (SEO Site Checkup, Is Agentic…) : le lire
+   dans Brave et trier chaque point en vrai / faux / hors sujet **avant** d'en corriger un.
+   Environ la moitié des alertes sont des faux positifs. Grille de tri et méthode de lecture :
+   `references/external-audits.md`.
 
 Consigner l'état dans la mémoire du projet, avec les dates : c'est la base de comparaison.
 
