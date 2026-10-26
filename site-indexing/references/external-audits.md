@@ -103,3 +103,5 @@ Tester **deux** 404  une adresse sous une langue valide et une adresse invent�
 
 Au passage  un `title` de 404 qui répète déjà le nom du site, combiné au gabarit
 `%s | Nom du site` du layout, produit « … | Nom du site | Nom du site .
+
+Et en habillant cette 404 : Next garde le `not-found` en réserve dans **chaque** page. Une `<img>` sans `loading="lazy"` dans la 404 est donc préchargée dans le `<head>` de tout le site (React 19, voir le piège 8 de `SKILL.md`). Mettre `loading="lazy"` : sur la 404 elle-même, l'image est à l'écran et se charge aussitôt. Et `metadata` n'est lu que dans `global-not-found` : dans un `not-found` de segment, le client remet le titre du layout. Un `<title>` rendu dans le composant (React 19 le hisse dans le `<head>`) règle le titre de l'onglet.
