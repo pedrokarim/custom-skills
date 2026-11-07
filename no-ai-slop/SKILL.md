@@ -1,6 +1,6 @@
 ---
 name: no-ai-slop
-description: Concevoir ou relire une interface, une page marketing, une landing, un embed, une maquette ou un visuel sans les tics des interfaces générées (« AI slop ») — surtitres numérotés en monospace, badges pilule, pilules de verre, points lumineux, fausses fenêtres de navigateur, titres surlignés partout, images toutes faites posées en bloc. Donne le catalogue des motifs refusés, la façon de concevoir à la place, la règle de composition des images et un script qui détecte ces motifs dans une page. À utiliser dès qu'on crée, refait ou critique une page, un écran, un composant visible, une maquette, une bannière ou une illustration de site, dès que l'utilisateur dit « AI slop », « générique », « ça fait IA », « pas de monospace », « trop template », « refais-la en mieux », et même s'il demande seulement « une landing », « un hero », « une page de présentation » ou « une iframe pour Top.gg ».
+description: Concevoir ou relire une interface, une page marketing, une landing, un embed, une maquette ou un visuel sans les tics des interfaces générées (« AI slop ») : surtitres numérotés en monospace, badges pilule, pilules de verre, points lumineux, fausses fenêtres et faux tableaux de bord, titres surlignés partout, textes sur un motif, images toutes faites posées en bloc. Donne aussi la façon de raconter la page (textes plats qui nomment la catégorie, un fait dur, des boutons verbe + objet), son plan section par section, le rythme des espacements, la composition des images à partir de l'officiel et un script qui détecte ces motifs dans la page. À utiliser dès qu'on crée, refait ou critique une page, un écran, un composant visible, une maquette, une bannière ou une illustration de site, qu'on écrit les textes d'une page, dès que l'utilisateur dit « AI slop », « générique », « ça fait IA », « pas de monospace », « trop template », « les espacements sont chelous », « refais-la en mieux », et même s'il demande seulement « une landing », « un hero », « une page de présentation » ou « une iframe pour Top.gg ».
 ---
 
 # Pas d'AI slop
@@ -53,6 +53,20 @@ faut faire à la place, est dans [`references/catalog.md`](references/catalog.md
   défini en clair **et** en sombre, et une page embarquée (iframe) fixe son propre
   `color-scheme` au lieu de subir celui de l'hôte.
 
+## Raconter la page
+
+Le fond d'une bonne page tient à deux choses, qu'on règle **avant** le visuel :
+
+- **Les textes** ([`references/copy.md`](references/copy.md)) : le h1 nomme la catégorie, le premier
+  écran porte un fait dur, chaque titre nomme une chose, chaque bouton est un verbe et ce qu'on
+  obtient, peu de mots par écran, aucune preuve ni donnée inventée.
+- **Le plan** ([`references/page-plan.md`](references/page-plan.md)) : une ligne par section, une
+  idée et une vraie image chacune, des dispositions qui varient, une fin de page calme. Puis le
+  **rythme** : une seule échelle d'espacement, rien d'orphelin, des colonnes qui s'équilibrent.
+
+Écrire tous les textes et le plan d'abord, dans un fichier à côté de la maquette ; construire
+ensuite.
+
 ## Concevoir à la place
 
 1. **Partir du contenu réel** : les vraies commandes, les vrais écrans, les vrais visuels du
@@ -102,8 +116,16 @@ Toute maquette ou page passe ce contrôle **avant** d'être montrée :
 3. Relire le catalogue ci-dessus en cherchant chaque motif à l'œil : le script ne voit pas une
    fausse fenêtre ni une grille de cartes identiques.
 4. Se demander pour chaque bloc : « qu'est-ce qu'il montre de vrai sur le produit ? »
+5. Relire le rythme sur la capture, section par section (`references/page-plan.md`) : écarts
+   réguliers, aucun bouton ou titre orphelin, colonnes équilibrées.
+6. Lire chaque texte à voix haute (`references/copy.md`).
 
 ## Erreurs déjà payées
+
+- Un gros skill de « goût » suivi à la lettre (tirages par scripts, quatre contrôleurs à cinq
+  largeurs) : 2 h 27 et des centaines de milliers de tokens pour une page embarquée de 7 200 px, sans
+  l'identité de la marque. Ses textes et son plan étaient bons : ils sont repris ici, pas sa
+  machinerie.
 
 - Une page validée par la mesure (aucun débordement) a été refusée comme « catastrophique » : la
   mesure ne juge pas le design. Regarder la capture et la comparer à une référence qui donne envie.
