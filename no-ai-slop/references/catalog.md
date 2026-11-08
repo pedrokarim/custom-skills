@@ -20,6 +20,7 @@
 | Fonds en bandes horizontales | coupent la page à des hauteurs sans raison | un fond continu ; les sections se distinguent par l'espace et le contenu |
 | Image énorme sans rôle | occupe l'écran sans rien dire | taille selon le rôle ; composer plusieurs pièces plutôt qu'un bloc |
 | Bandes colorées décoratives autour d'une carte | accent sans fonction | rien, ou un vrai séparateur interne qui structure |
+| Liseré latéral coloré « façon embed Discord » (`border-left` épais, ou `::before` de 3 à 6 px collé au bord d'une carte, d'une ligne, d'une récompense, d'une alerte) | tic le plus reconnaissable des pages générées ; la couleur ne dit rien que le contenu ne dise déjà | la couleur dans le visuel, l'icône ou un fond léger de la vignette ; l'état d'une alerte dit en mots. Seule exception : l'aperçu fidèle d'un vrai embed Discord |
 | Carte dans une carte | les boîtes s'empilent sans dire de hiérarchie | une surface par région ; à l'intérieur, l'espace et un séparateur fin |
 | Carte fantôme : trait fin et grande ombre floue sur la même boîte | deux bords pour un seul travail | choisir : un trait, ou une élévation courte (flou serré, faible opacité) |
 | Ombre plus large que l'objet, ombre colorée | ne correspond à aucune hauteur | une petite échelle d'élévation, jamais une ombre plus grande que ce qui la porte |

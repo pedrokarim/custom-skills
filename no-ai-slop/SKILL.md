@@ -40,6 +40,11 @@ faut faire à la place, est dans [`references/catalog.md`](references/catalog.md
 - La **grille de cartes identiques** icône-carrée + titre + phrase, répétée section après section.
 - Flèches « → » décoratives, étincelles ✦, emojis de décoration.
 - **Barres, bandes ou rails colorés** autour d'une carte ou d'une section sans fonction.
+- **Le liseré latéral coloré « façon embed Discord »** sur une carte, une ligne de liste, une
+  récompense ou une alerte, qu'il soit en `border-left` ou dessiné par un `::before` : jamais.
+  C'est le tic le plus reconnaissable des interfaces générées. La couleur d'un élément passe
+  par son visuel, son icône ou un fond léger. Seule exception : un aperçu qui reproduit
+  fidèlement un vrai embed Discord.
 - **Cartes dans des cartes**, carte à trait fin et grande ombre floue, **tuile teintée** autour de
   l'icône au-dessus de chaque titre.
 

@@ -156,6 +156,21 @@
       }
     }
 
+    // Le même liseré dessiné par un pseudo-élément : bande étroite, pleine hauteur, collée à un bord.
+    if (r.width >= 60 && r.height >= 24) {
+      for (const pseudo of ["::before", "::after"]) {
+        const ps = getComputedStyle(el, pseudo);
+        if (ps.content === "none" || ps.position !== "absolute") continue;
+        const w = parseFloat(ps.width), h = parseFloat(ps.height);
+        const bg = parseColor(ps.backgroundColor);
+        if (!bg || bg.a < 0.5 || isNeutral(bg)) continue;
+        const atEdge = parseFloat(ps.left) <= 1 || parseFloat(ps.right) <= 1;
+        if (atEdge && w >= 2 && w <= 8 && h >= r.height * 0.8) {
+          out.sideStripe.push(`${describe(el)} (liseré ${pseudo} ${w} px)`);
+        }
+      }
+    }
+
     if (!el.matches(CONTROL) && !inArt(el) && r.width >= 50 && r.height >= 30 && el.textContent.trim().length >= 10 && isCard(el)) {
       for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
         if (!p.matches(CONTROL) && isCard(p)) {
