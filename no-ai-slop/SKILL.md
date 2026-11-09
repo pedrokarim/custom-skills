@@ -131,10 +131,29 @@ réutiliser. **On compose.**
 Le détail (prompts de pièces, contrôle du style, erreurs déjà faites) est dans
 [`references/images.md`](references/images.md).
 
+## Une page existante garde toutes ses fonctions
+
+Retirer les tics d’une page qui fonctionne déjà ne doit rien lui retirer d’autre. **Avant la
+première ligne**, lire la page (son code **et** la page en ligne) et écrire la liste de ce
+qu’elle fait : chaque bouton, lien, sélecteur, menu, filtre, recherche, chargement au défilement,
+saut vers une ancre, paramètre d’URL (`?v=`, `#id`), état (chargement, vide, erreur), raccourci.
+
+**Après la refonte**, sur la page compilée (staging, jamais une maquette injectée) : chaque
+élément de la liste est essayé **pour de vrai**, au clic du navigateur piloté, au clavier pour
+les menus, avec l’URL qui porte le paramètre. Une fonction qui ne répond plus est un défaut
+bloquant, au même titre qu’un débordement. Le compte rendu donne la liste, fonction par
+fonction : marche, réparée, ou retirée volontairement (et pourquoi).
+
+Un composant réutilisé dans une autre forme (un sélecteur qui recevait un déclencheur sur mesure
+et passe à son déclencheur par défaut) se teste comme du code neuf : un chemin jamais emprunté
+n’a jamais été vérifié.
+
 ## Relire avant de montrer
 
 Toute maquette ou page passe ce contrôle **avant** d'être montrée :
 
+0. **Les fonctions d’abord** : la liste de la section précédente, essayée au clic sur la page
+   compilée. Une page plus belle qui ne fait plus ce qu’elle faisait n’est pas terminée.
 1. **Regarder d'abord, mesurer ensuite** : la capture dans **les deux thèmes** et dans son
    contexte réel (une iframe dans la page hôte, pas seulement seule). Noter son jugement avant de
    lancer le script, pour que la mesure n'oriente pas le regard.
@@ -194,3 +213,7 @@ changerait le plus la page.
   couleurs en dur suivent : le nom du produit est devenu invisible dans sa propre barre.
 - Des illustrations générées d'un bloc, dans un style différent de la mascotte officielle, posées
   en très grand : « sortir une image toute préparée, non ». Composer à partir de l'officiel.
+- Une page de journal des versions refaite sans ses tics, vérifiée sur une maquette injectée
+  dans la page puis mise en production : son bouton « aller à une version » ne s’ouvrait plus.
+  La refonte avait remplacé le déclencheur sur mesure du sélecteur par son déclencheur par
+  défaut, jamais utilisé ni testé. Personne n’avait cliqué dessus avant la mise en ligne.
