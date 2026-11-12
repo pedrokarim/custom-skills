@@ -1,6 +1,6 @@
 ---
 name: site-indexing
-description: Faire indexer un site par Google et Bing en travaillant directement dans la Search Console et Bing Webmaster Tools, pilotées depuis le navigateur Brave de l'utilisateur via le MCP `brave`. Diagnostic de l'indexation réelle (rapports, inspection d'URL, test en ligne), mesure de ce que Googlebot charge, correctifs côté code (pages maigres, sitemap, hôtes en double, poids de page, meta descriptions, IndexNow), puis demandes d'indexation. À utiliser dès qu'on parle de SEO, d'indexation, de référencement, de Search Console, de Bing Webmaster, de sitemap, ou qu'un site « n'apparaît nulle part sur Google », même si la demande ne cite aucun de ces mots.
+description: Faire indexer un site par Google et Bing en travaillant directement dans la Search Console et Bing Webmaster Tools, pilotées depuis le navigateur Brave de l'utilisateur via le MCP `brave`. Diagnostic de l'indexation réelle (rapports, inspection d'URL, test en ligne), mesure de ce que Googlebot charge, correctifs côté code (pages maigres, sitemap, hôtes en double, poids de page, meta descriptions, IndexNow), puis demandes d'indexation. À utiliser dès qu'on parle de SEO, d'indexation, de référencement, de Search Console, de Bing Webmaster, de sitemap, de robots.txt, de hreflang, de liens entrants (backlinks), ou qu'un site « n'apparaît nulle part sur Google », même si la demande ne cite aucun de ces mots.
 ---
 
 # Faire indexer un site, en travaillant dans les consoles
@@ -56,6 +56,8 @@ est dans `references/brave-mcp-consoles.md`. Le lire avant la première action.
    - **Inspection de l'URL** sur l'accueil : date de « Dernière exploration ». Sur le site d'origine, Google
      n'était pas revenu sur l'accueil depuis trois mois.
 3. Bing Webmaster Tools : accueil, Sitemaps, IndexNow, inspection d'URL de l'accueil.
+   Liens entrants : rapport « Liens » de la Search Console, et Ahrefs Webmaster Tools (gratuit
+   pour les sites vérifiés ; voir `references/diagnostics.md`).
 4. Les analytics du site : visites venues des moteurs, par référent.
 5. Si l'utilisateur apporte un **audit en ligne** (SEO Site Checkup, Is Agentic…) : le lire
    dans Brave et trier chaque point en vrai / faux / hors sujet **avant** d'en corriger un.
@@ -86,10 +88,18 @@ précise** n'est pas une panne de Google : c'est la page. Ne pas l'annoncer com
 
 ### 4. Vérifier le HTML servi
 
-`scripts/seo_check.py page <url>` : statut, `X-Robots-Tag`, robots, canonical, hreflang,
-présence dans le `<head>`, longueur de la description, préchargements d'images, poids du HTML.
-`scripts/seo_check.py sitemap <url>` : composition du sitemap par section. Si une section
-pèse la majorité des URL, regarder une de ses pages : combien de mots propres ?
+`scripts/seo_check.py` (Python standard, lancer avec `python -I`) :
+
+| Commande | Ce qu'elle vérifie |
+|---|---|
+| `page <url>…` | statut, `X-Robots-Tag`, robots, canonical, hreflang (auto-référence, codes), place dans le `<head>`, **position au-delà des 2 Mo que lit Googlebot**, JSON-LD lisible, description, préchargements d'images |
+| `hreflang <url>` | chaque version annoncée répond 200, est canonique et **renvoie vers toutes les autres** |
+| `robots <site>` | code de réponse du fichier, groupe suivi par chaque robot (moteurs et IA), chemin permis ou non |
+| `sitemap <site> --sample 12` | sitemaps déclarés, limites, `lastmod` identiques, doublons, composition par section, puis un échantillon d'URL par section : 200, pas de `noindex`, canonical sur elle-même |
+
+Si une section pèse la majorité des URL, regarder une de ses pages : combien de mots
+propres ? Lancer `page` sur **plusieurs** pages et comparer titre et canonical d'une page à
+l'autre (piège 18).
 
 ### 5. Mesurer le poids à la façon de Googlebot
 
@@ -100,7 +110,10 @@ pas, il charge tout. Mesurer ainsi, avec le MCP :
    la mesure, on a vu 18,6 Mo s'afficher « 1,8 Mo » ;
 2. `emulate` : viewport `412x9000x1,mobile,touch`, user-agent Googlebot smartphone ;
 3. `navigate_page`, puis `evaluate_script` avec **le contenu** de `scripts/page-weight.js`
-   collé dans `function` (attend 20 s, puis regroupe les octets par dossier).
+   collé dans `function` (attend 20 s, puis regroupe les octets par dossier) ;
+4. dans le même onglet, `scripts/render-gap.js` : ce que le JavaScript change au titre, au
+   canonical, aux robots, au texte et aux liens. Tout ce qui compte doit être dans le HTML
+   servi.
 
 Repère observé, pas une limite documentée par Google : l'accueil du site d'origine échouait à 18,6 Mo
 et passait à 6,3 Mo ; les pages qui passaient pesaient moins de 1 Mo.
@@ -117,13 +130,19 @@ rentables :
 - poids de page : images à la taille d'affichage, rien de chargé « en douce » en pleine taille ;
 - meta descriptions **≤ 160 caractères** (Bing les classe en erreur au-delà).
 
+Avant de déployer, photographier les pages clés :
+`seo_check.py snapshot <url>… -o avant.json` ; après, `seo_check.py diff avant.json`. Chaque
+titre, canonical, robots ou hreflang qui a changé doit être voulu (le canonical hérité du
+piège 18 se serait vu ainsi).
+
 Déployer en production : l'outil de Google n'inspecte que le vrai domaine.
 
 ### 7. Agir dans les consoles
 
 1. Retester la page qui échouait (« Tester l'URL active »).
 2. **Demander l'indexation** des pages clés, accueil en premier. Quota d'environ 10 par jour et
-   par propriété : choisir.
+   par propriété : choisir. **Pas l'API d'indexation de Google** : elle ne sert qu'aux offres
+   d'emploi et aux vidéos en direct (`references/crawlers.md`).
 3. Renvoyer le sitemap s'il a changé.
 4. Lancer IndexNow pour Bing et les moteurs associés (`scripts/indexnow.mjs`). **Google ne lit
    pas IndexNow.**
@@ -166,7 +185,8 @@ soit.
 10. **Insister sur une erreur** : relancer trois fois « Demander une indexation » consomme du
     quota et n'apprend rien. Changer d'URL de test plutôt (étape 3).
 11. **Conclure « aucun effet »** sur un rapport dont la date de mise à jour précède le
-    correctif.
+    correctif. Même chose après un canonical corrigé : Google peut garder la page dans son
+    groupe de doublons jusqu'à deux semaines.
 12. **IndexNow** : le premier envoi répond `403 SiteVerificationNotCompleted` tant que le
     service n'a pas lu le fichier de clé. Il faut que la clé soit déployée, puis réessayer
     quelques minutes plus tard (le script de suivi le fait). Et il ne sert à rien pour Google.
@@ -199,6 +219,12 @@ soit.
     n'applique **que** le groupe qui le nomme : un groupe `User-agent: Googlebot` réduit à
     `Allow: /` annule pour lui tous les `Disallow` du groupe général. Lire le `robots.txt` en
     entier avant de conclure à un blocage (ou à son absence).
+
+20. **Recopier les affirmations d'un autre outil SEO sans les sources.** En reprenant un skill
+    tiers, plusieurs « faits » se sont révélés faux une fois comparés à la documentation :
+    un `robots.txt` en 5xx n'est pas un « tout interdit » durable, `Claude-User` respecte bien
+    `robots.txt`, et ce que Google écrit sur le rendu JavaScript est prudent (« may », « might »),
+    pas catégorique. Citer la page de Google ou de l'éditeur, ou ne rien affirmer.
 
 ## Ce que ce skill ne fait pas
 

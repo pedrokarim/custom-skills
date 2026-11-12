@@ -114,7 +114,7 @@ seulement. Bing reprend la vérification et les sitemaps, sans DNS ni balise.
 | Accueil (clics, impressions) | `https://www.bing.com/webmasters/home?siteUrl=<S>` |
 | Sitemaps | `/webmasters/sitemaps?siteUrl=<S>` |
 | IndexNow | `/webmasters/indexnow?siteUrl=<S>` (fenêtre des 15 dernières heures seulement) |
-| Performances (requêtes, pages, pays) | `/webmasters/searchperf?siteUrl=<S>` ; le tableau des mots-clés est lisible dans `innerText` |
+| Performances (requêtes, pages, pays) | `/webmasters/searchperf?siteUrl=<S>` ; le tableau des mots-clés est lisible dans `innerText` |
 | Explorateur de site | `/webmasters/siteexplorer?siteUrl=<S>` (plusieurs jours de retard) ; le nombre de pages indexées est dans le libellé du graphique « Crawl information » (`Indexed:262, Error:0…`) |
 | Inspection d'URL | `/webmasters/urlinspection?siteUrl=<S>&urlToInspect=<URL encodée deux fois>` |
 
@@ -147,3 +147,27 @@ evaluate_script { pageId, function: <contenu de scripts/page-weight.js>, waitFor
 
 Le contexte isolé est vierge : pas de cache, pas de cookie, comme Googlebot. **Un nom neuf à
 chaque mesure** : réutiliser un contexte réutilise son cache.
+
+## Comparer le HTML servi et la page rendue
+
+Dans le même onglet, après la mesure de poids (ou dans un onglet neuf, émulé de la même
+façon) :
+
+```
+evaluate_script { pageId, function: <contenu de scripts/render-gap.js>, waitForStableDom: false }
+```
+
+Le script relit l'adresse de la page par `fetch` (le HTML servi, sans JavaScript), compare
+titre, robots, canonical, hreflang, H1, types JSON-LD, nombre de mots et de liens avec le
+DOM rendu, et rend une liste `findings`. Liste vide : Google lit la même chose avant et
+après rendu. Essayé le 12/11/2026 sur une application rendue côté client : « 99 % du texte
+n'existe qu'après JavaScript ».
+
+## Ahrefs Webmaster Tools
+
+Compte gratuit : `https://app.ahrefs.com/dashboard` liste les projets (un par site vérifié,
+souvent importés depuis la Search Console) avec, pour chacun, les liens directs vers
+Site Explorer (domaines référents, pages, mots-clés organiques) et Site Audit. Les pages se
+remplissent lentement : attendre 8 s avant de lire `document.body.innerText`. Un domaine
+non vérifié répond « Domain not verified » : pas de données sur les concurrents sans
+abonnement.

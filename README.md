@@ -13,7 +13,7 @@ quand s’en servir, comment, pourquoi chaque étape existe, et les erreurs déj
 | [`custom-skills`](custom-skills/SKILL.md) | Le point d’entrée : connaît ce dépôt, sait y ajouter un skill ou en corriger un. Dans n’importe quel projet, « ajoute ça aux custom skills » suffit. |
 | [`flat-pixel-art-scenes`](flat-pixel-art-scenes/SKILL.md) | Créer des scènes en pixel art à grands aplats, profondes et calmes, et les animer en boucle (fond de menu, GIF) |
 | [`no-ai-slop`](no-ai-slop/SKILL.md) | Concevoir ou relire une page, une maquette ou un visuel sans les tics des interfaces générées : catalogue des motifs refusés, composition des images à partir de l’officiel, script qui détecte ces motifs dans la page |
-| [`site-indexing`](site-indexing/SKILL.md) | Faire indexer un site par Google et Bing : diagnostic dans la Search Console et Bing Webmaster Tools pilotées depuis Brave (MCP `brave`), correctifs côté code, demandes d’indexation |
+| [`site-indexing`](site-indexing/SKILL.md) | Faire indexer un site par Google et Bing : diagnostic dans la Search Console et Bing Webmaster Tools pilotées depuis Brave (MCP `brave`), vérifications sans navigateur (page, hreflang, robots.txt, sitemap échantillonné, avant / après déploiement), correctifs côté code, demandes d’indexation |
 
 ## Installation
 

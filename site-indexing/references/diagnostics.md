@@ -26,7 +26,20 @@ pas le bon.
 - **canonical, hreflang, robots, title, description dans le `<head>`** : certaines versions
   de Next.js diffusent les métadonnées en streaming dans le `<body>` pour les robots qui
   exécutent le JavaScript, et Google ignore un canonical hors du `<head>` ;
-- **hreflang** : une entrée par langue en codes BCP 47, plus un `x-default` ;
+- **hreflang** : une entrée par langue en codes BCP 47, plus un `x-default`. Chaque version
+  « must list itself as well as all other language versions », et « if two pages don't both
+  point to each other, the tags will be ignored ». `seo_check.py hreflang <url>` va chercher
+  chaque version et vérifie le retour. Un pays seul n'est pas un code ; `UK`, `EU` et `UN`
+  n'ont aucun effet (`en-GB`, pas `en-UK`) ; la casse ne compte pas ;
+- **moins de 2 Mo de HTML** : Googlebot lit « the first 2MB » d'un HTML, décompressé et en-têtes
+  compris, puis indexe la partie lue et ignore la suite. Un canonical, un hreflang ou un
+  JSON-LD placé après est perdu : `seo_check.py page` le signale. C'est une autre limite que
+  le poids total des ressources (`page-weight.js`) ;
+- **le même `<head>` avant et après JavaScript** (`scripts/render-gap.js`, dans Brave). Google
+  rend la page après l'avoir lue, et sa documentation (décembre 2025) est prudente : le
+  canonical se choisit avant et après rendu, il faut donc le même ; un `noindex` retiré par
+  JavaScript « may not work as expected » ; sur une réponse autre que 200, « rendering might
+  be skipped » ;
 - **description** entre 50 et 160 caractères (au-delà, Bing la classe en erreur ; les langues
   CJK sont plus denses, une description courte y est normale) ;
 - **préchargements d'images** (`<link rel="preload" as="image">`) : quelques-uns pour l'image
@@ -50,7 +63,20 @@ pas le bon.
 Un sitemap liste **ce qu'on demande d'indexer**. Si une section énorme est faite de pages
 maigres, elle dilue tout le reste. La retirer a fait passer le sitemap de 7 224 à 665 URL.
 
-Pas de `lastmod` plutôt qu'un `lastmod` faux (horodatage de build ou `new Date()`).
+Pas de `lastmod` plutôt qu'un `lastmod` faux (horodatage de build ou `new Date()`). Google
+« uses the `<lastmod>` value if it's consistently and verifiably accurate » ; le script
+signale une liste où 90 % des dates sont identiques. Il ignore `<priority>` et
+`<changefreq>`.
+
+Ce que `seo_check.py sitemap <site>` vérifie aussi : les sitemaps déclarés dans
+`robots.txt` (tous, pas seulement le premier), les fichiers `.gz`, la limite de **50 000 URL
+ou 50 Mo décompressés** par fichier, l'index qui liste un autre index (refusé par Google :
+« A sitemap index file can't list other sitemap index files »), les doublons, les URL d'un
+autre hôte ou en `http://`.
+
+Avec `--sample 12`, il prend des URL **dans chaque section** et vérifie que chacune répond
+200 sans redirection, sans `noindex`, avec un canonical sur elle-même. Une URL du sitemap qui
+échoue à l'un de ces tests demande à Google d'indexer ce qu'on lui refuse ailleurs.
 
 ## Catalogue des correctifs
 
@@ -66,7 +92,31 @@ Pas de `lastmod` plutôt qu'un `lastmod` faux (horodatage de build ou `new Date(
 | Meta description trop longue | ≤ 160 caractères, dans chaque langue | Erreur dans Bing ; tronquée dans les résultats |
 | Bing et moteurs associés lents à découvrir | IndexNow (`scripts/indexnow.mjs`) | Prévient Bing, Yandex, Seznam, Naver ; DuckDuckGo, Ecosia, Yahoo et Qwant s'appuient sur Bing. Pas Google |
 
-## Liens entrants : vérifier avant de démarcher
+## Données structurées : ce qui ne s'affiche plus
+
+Ne pas proposer de balisage pour un résultat enrichi que Google a retiré :
+
+- **FAQ** (`FAQPage`) : plus affichée dans Google depuis le 7 mai 2026, documentation retirée
+  le 15 juin 2026. Un `FAQPage` existant ne gêne pas ; en ajouter un n'apporte rien.
+- **HowTo** : retiré le 13 septembre 2023.
+
+Le JSON-LD utile se met dans le HTML servi, pas ajouté par JavaScript (`render-gap.js` le
+repère).
+
+## Liens entrants : où les compter sans payer
+
+| Outil | Ce qu'il montre | Limite |
+|---|---|---|
+| Search Console, rapport **Liens** | liens externes que Google connaît | son propre site seulement |
+| **Ahrefs Webmaster Tools** (compte gratuit, `app.ahrefs.com`) | domaines référents, liens, ancres, pages les plus liées, audit de site, analyse des robots | **sites vérifiés seulement** : sur tout autre domaine, « Domain not verified ». Mots-clés suivis non inclus |
+| Bing Webmaster Tools, rapport **Backlinks** | liens entrants, y compris, d'après Bing, « for any website » (comparaison avec d'autres sites) | à confirmer dans une session connectée : pas encore essayé |
+
+Dans Ahrefs, chaque site est un projet : les adresses directes sont sur le tableau de bord
+(`/site-explorer/refdomains?mode=subdomains&projectId=<id>&target=<hôte>%2F`). Lire le
+tableau avec `document.body.innerText` après 8 s d'attente. Les offres payantes (suivi de
+positions, concurrents) ne servent pas ce skill.
+
+## Liens entrants : vérifier avant de démarcher
 
 Un lien n'aide Google que s'il est sur une page **publique** qu'il explore. Un message Discord
 ne compte pas (serveurs privés, jamais explorés) : il amène des visiteurs, pas un signal.
@@ -76,11 +126,11 @@ jeu de DNA en octobre 2026). Google s'en sert au mieux pour découvrir des pages
 classer le site. Avant de proposer un lien, mesurer l'activité du wiki par son API, depuis
 un onglet ouvert dessus (`fetch` vers `/api.php?format=json&origin=*&…`) :
 
-- `meta=siteinfo&siprop=statistics` : `activeusers` (contributeurs des 30 derniers jours) ;
+- `meta=siteinfo&siprop=statistics` : `activeusers` (contributeurs des 30 derniers jours) ;
 - `list=allusers&augroup=sysop|bureaucrat` puis `list=usercontribs&uclimit=1&ucuser=<nom>` :
-  date de la dernière contribution de chaque administrateur ;
+  date de la dernière contribution de chaque administrateur ;
 - `prop=info&inprop=protection&titles=<page d'accueil>` : l'accueil est souvent réservé aux
-  administrateurs ;
+  administrateurs ;
 - `list=exturlusage&euquery=<domaine>` : le wiki cite-t-il déjà des outils de fans ?
 - la page `<Wiki>:Wiki rules` : la règle Fandom par défaut interdit l'autopromotion et renvoie
   vers un administrateur.
@@ -99,3 +149,4 @@ de temps. Les guides Steam du jeu, publics et bien explorés, sont un meilleur c
 | Bing : sitemap importé → premières impressions | 2 jours |
 | Bing : explorateur de site | plusieurs jours après que l'inspection d'URL dit « Indexed » |
 | Effet d'un correctif sur l'indexation Google | 2 à 4 semaines |
+| Page qui sort d'un groupe de doublons (canonical corrigé) | jusqu'à 2 semaines, d'après Google : « might hold pages in a duplicate cluster for up to two weeks » |
