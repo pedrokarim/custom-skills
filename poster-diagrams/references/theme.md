@@ -38,6 +38,14 @@ clair, et ne ressemble à aucun outil de schémas.
    ombres décalées ; une police fine non.
 6. Logo et nom dans `.brand` (en bas à droite) : une image de 26 px et un texte, ou rien.
 
+## Fond personnalisé d'une planche
+
+Pour une seule planche, poser le fond sur la planche elle-même :
+`<div class="board no-halftone" style="--w:1600px; --h:900px; background: linear-gradient(135deg, #F6D365, #FDA085)">`.
+Un fond doit rester calme sous les nœuds : un dégradé doux ou une couleur, rarement une image.
+Si le fond est sombre, prendre plutôt la variante sombre ci-dessous, pour que les fils et les
+étiquettes changent aussi de couleur.
+
 ## Variante sombre
 
 Le thème par défaut est volontairement clair (un papier). Pour une version sombre, dupliquer

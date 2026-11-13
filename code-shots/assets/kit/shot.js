@@ -16,6 +16,18 @@
  *     width: 1600,                        largeur de la planche (1200 pour un format carré)
  *     fontSize: 17,                       taille du code en px (19 par défaut), pour des lignes longues
  *     foot: 'Projet · bot Discord',        texte en pied à gauche (facultatif)
+ *
+ *     Options d'habillage, toutes facultatives (par défaut : papier de la DA, pas de fenêtre) :
+ *     background: 'sunset',               fond : un préréglage (paper, ink, sunset, ocean, candy,
+ *                                         midnight, mint, dusk), une couleur ou un dégradé CSS,
+ *                                         ou { image: 'assets/fond.jpg', position: 'center',
+ *                                         overlay: 'rgba(0,0,0,.25)', tone: 'dark' }
+ *     tone: 'dark',                       texte de la planche clair (fond sombre) ; deviné pour
+ *                                         les préréglages, à donner pour une image ou une couleur
+ *     window: 'mac',                      boutons de fenêtre façon macOS dans l'en-tête de la carte
+ *     layout: 'frame',                    la carte seule sur son fond, à la ray.so (sans titre,
+ *                                         chapô, notes ni pied) ; 'poster' par défaut
+ *     halftone: true,                     garder la trame des coins sur un fond personnalisé
  *   };
  *
  * Expose window.boardReady et window.checkBoard, comme les planches de poster-diagrams :
@@ -31,6 +43,37 @@
   };
 
   const shot = window.SHOT;
+
+  // Fonds prêts à l'emploi. `dark` : le texte posé dessus passe en clair.
+  const BACKGROUNDS = {
+    paper: { css: 'var(--paper)', dark: false },
+    ink: { css: '#1A1A1A', dark: true },
+    sunset: { css: 'linear-gradient(135deg, #FF9A8B 0%, #FF6A88 55%, #FF99AC 100%)', dark: false },
+    ocean: { css: 'linear-gradient(135deg, #2E3192 0%, #1BFFFF 100%)', dark: true },
+    candy: { css: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%)', dark: true },
+    midnight: { css: 'radial-gradient(120% 120% at 20% 0%, #3A3F8F 0%, #15172E 55%, #0B0C18 100%)', dark: true },
+    mint: { css: 'linear-gradient(135deg, #D4FC79 0%, #96E6A1 100%)', dark: false },
+    dusk: { css: 'linear-gradient(160deg, #F6D365 0%, #FDA085 45%, #8E6CB0 100%)', dark: false },
+  };
+
+  function applyBackground(board) {
+    const bg = shot.background;
+    if (!bg || bg === 'paper') return;
+    let dark = false;
+    if (typeof bg === 'string') {
+      const preset = BACKGROUNDS[bg];
+      board.style.background = preset ? preset.css : bg;
+      dark = preset ? preset.dark : false;
+    } else if (bg.image) {
+      const overlay = bg.overlay ? `linear-gradient(${bg.overlay}, ${bg.overlay}), ` : '';
+      board.style.background = `${overlay}url("${bg.image}") ${bg.position || 'center'} / ${bg.size || 'cover'} no-repeat`;
+      dark = bg.tone === 'dark';
+    }
+    if (shot.tone) dark = shot.tone === 'dark';
+    board.classList.add('custom-bg');
+    if (dark) board.classList.add('on-dark');
+    if (!shot.halftone) board.classList.add('no-halftone');
+  }
   const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   const escape = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -74,7 +117,13 @@
     board.style.setProperty('--w', `${shot.width || 1600}px`);
     board.style.setProperty('--h', 'auto');
     if (shot.fontSize) board.style.setProperty('--code-size', `${shot.fontSize}px`);
-    const hasNotes = (shot.notes || []).length > 0;
+    const frame = shot.layout === 'frame';
+    if (frame) {
+      board.classList.add('frame');
+      if (!shot.width) board.style.setProperty('--w', '1200px');
+    }
+    applyBackground(board);
+    const hasNotes = !frame && (shot.notes || []).length > 0;
     const first = shot.start || 1;
     const lines = shot.code.replace(/\t/g, '  ').replace(/\s+$/, '').split('\n');
     const last = (() => {
@@ -88,20 +137,26 @@
     const label = shot.langLabel || LANG_LABELS[shot.lang] || shot.lang;
     const range = last > first ? `lignes ${first} à ${last}` : `ligne ${first}`;
 
-    board.innerHTML = `
-      <div class="head">
+    const controls = shot.window
+      ? '<span class="controls" aria-hidden="true"><i class="close"></i><i class="minimize"></i><i class="zoom"></i></span>'
+      : '';
+    const head = frame
+      ? ''
+      : `<div class="head">
         <h1>${shot.title}${shot.second ? `<br><span class="second">${shot.second}</span>` : ''}</h1>
         ${shot.lede ? `<p>${shot.lede}</p>` : ''}
-      </div>
+      </div>`;
+    board.innerHTML = `
+      ${head}
       <div class="shot-body${hasNotes ? ' with-notes' : ''}">
-        <div class="code-card" data-id="card">
-          <div class="code-head"><b>${escape(shot.file || '')}</b><span>${range}</span><span class="lang">${label}</span></div>
+        <div class="code-card${shot.window ? ' windowed' : ''}" data-id="card">
+          <div class="code-head">${controls}<b>${escape(shot.file || '')}</b><span>${range}</span><span class="lang">${label}</span></div>
           <div class="code" id="code"></div>
         </div>
         ${hasNotes ? '<div class="notes" id="notes"></div>' : ''}
       </div>
-      ${shot.foot ? `<div class="shot-foot">${shot.foot}</div>` : ''}
-      ${brand}`;
+      ${!frame && shot.foot ? `<div class="shot-foot">${shot.foot}</div>` : ''}
+      ${frame ? '' : brand}`;
     return { lines, first, hasNotes };
   }
 
@@ -184,7 +239,7 @@
       const src = row.querySelector('.src');
       if (src.scrollWidth > src.clientWidth + 1) issues.push(`ligne ${row.dataset.line} trop longue pour la carte : couper la ligne ou élargir la planche`);
     }
-    for (const note of shot.notes || []) {
+    for (const note of shot.layout === 'frame' ? [] : shot.notes || []) {
       if (!document.querySelector(`.code .row[data-line="${note.line}"]`)) issues.push(`note sur la ligne ${note.line}, absente de l'extrait`);
     }
     const b = board.getBoundingClientRect();

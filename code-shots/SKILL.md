@@ -1,6 +1,6 @@
 ---
 name: code-shots
-description: Faire de beaux visuels d'extraits de code, à la manière de ray.so ou Carbon mais faits maison et sans fausse fenêtre, pour un article, un portfolio, un fil sur X ou une présentation, et surtout savoir quels extraits d'un projet valent une capture. Repère dans un dépôt les bouts de code qui racontent quelque chose (astuce, contournement, décision, algorithme, anecdote), en extrait les lignes exactes, les met en page avec coloration syntaxique, lignes mises en avant et notes numérotées, puis exporte en PNG haute définition et en PDF. À utiliser dès qu'on parle de capture de code, de « screen » de code, de ray.so, Carbon, snippet joli, code pour un article ou un tweet, extrait à mettre en avant, ou qu'on demande « qu'est-ce qu'il y a d'intéressant à montrer dans ce code », même sans citer d'outil.
+description: Faire de beaux visuels d'extraits de code, à la manière de ray.so ou Carbon mais faits maison (fond personnalisé, boutons de fenêtre macOS et mode cadre sur demande), pour un article, un portfolio, un fil sur X ou une présentation, et surtout savoir quels extraits d'un projet valent une capture. Repère dans un dépôt les bouts de code qui racontent quelque chose (astuce, contournement, décision, algorithme, anecdote), en extrait les lignes exactes, les met en page avec coloration syntaxique, lignes mises en avant et notes numérotées, puis exporte en PNG haute définition et en PDF. À utiliser dès qu'on parle de capture de code, de « screen » de code, de ray.so, Carbon, snippet joli, code pour un article ou un tweet, extrait à mettre en avant, ou qu'on demande « qu'est-ce qu'il y a d'intéressant à montrer dans ce code », même sans citer d'outil.
 ---
 
 # Captures de code, faites maison
@@ -59,8 +59,8 @@ qui touche le code.
 
 ## Composition
 
-- **Pas de fausse fenêtre** (trois points rouge-jaune-vert, barre de titre) : l'en-tête de la
-  carte porte de vraies informations, le chemin du fichier, les lignes, le langage.
+- **Par défaut, la DA du projet** : papier, carte d'encre, en-tête qui porte de vraies
+  informations (chemin du fichier, lignes, langage), pas de fausse fenêtre.
 - **Monospace pour le code seulement.** Titres, notes, en-tête : la police du texte.
 - **La mise en avant passe par le fond de la ligne et l'estompage des autres**, jamais par un
   liseré coloré sur le côté.
@@ -69,6 +69,28 @@ qui touche le code.
   1200 px sans notes pour un format plus serré (`width: 1200`).
 - **La signature** (`.brand`, en bas à droite) et le pied (`foot`, en bas à gauche) sont
   facultatifs ; le pied dit d'où vient le code (« le projet · bot Discord »).
+
+## Habillage à la demande
+
+Rien de ceci n'est activé par défaut : on l'ajoute quand l'utilisateur le demande (« un fond
+custom », « les boutons de fenêtre comme ray.so », « juste le code sur un dégradé »).
+
+| Demande | Dans `window.SHOT` |
+|---|---|
+| un fond prêt à l'emploi | `background: 'sunset'` (aussi `ink`, `ocean`, `candy`, `midnight`, `mint`, `dusk`) |
+| une couleur ou un dégradé précis | `background: 'linear-gradient(135deg, #0F2027, #2C5364)', tone: 'dark'` |
+| une image de fond | `background: { image: 'assets/fond.jpg', overlay: 'rgba(10,10,20,.55)', tone: 'dark' }` |
+| les boutons de fenêtre macOS | `window: 'mac'` (fermer, réduire, plein écran, aux couleurs d'Apple) |
+| le code seul, à la ray.so | `layout: 'frame'` (carte centrée sur le fond, 1200 px, sans titre, notes ni pied) |
+| garder la trame des coins | `halftone: true` |
+
+- `tone: 'dark'` passe le titre, le chapô, les notes et le pied en clair. Il est deviné pour
+  les fonds prêts à l'emploi ; pour une couleur ou une image, le donner.
+- Une image se range dans `src/assets/`. Si elle est chargée (visage, texte, motif), la voiler
+  (`overlay`) ou passer en mode cadre : les notes posées dessus doivent rester lisibles.
+- Une image de fond peut venir de l'utilisateur, d'un visuel officiel du projet, ou se générer
+  (sans texte ni logo). Ne jamais publier une image dont on n'a pas les droits.
+- Sur un fond personnalisé, la carte prend une ombre portée pour se détacher.
 
 ## Pièges déjà payés
 
@@ -89,4 +111,5 @@ qui touche le code.
 - `references/picking.md` : la grille pour trouver et trier les extraits, avec des exemples de
   ce qui marche et de ce qui ne marche pas.
 - `references/writing.md` : titres, chapô, notes, fiche d'accompagnement, relecture.
-- `assets/examples/` : un exemple rendu.
+- `assets/examples/` : un exemple dans la DA (`lease.webp`) et un exemple en mode cadre, fond
+  `sunset` et boutons macOS (`frame-sunset.webp`).

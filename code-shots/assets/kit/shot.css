@@ -133,3 +133,24 @@
   font-weight: 600;
   color: var(--muted);
 }
+
+/* Boutons de fenêtre façon macOS : seulement sur demande (`window: 'mac'`). */
+.code-head .controls { display: inline-flex; gap: 8px; margin-right: 6px; align-self: center; }
+.code-head .controls i { display: block; width: 13px; height: 13px; border-radius: 50%; }
+.code-head .controls .close { background: #FF5F57; box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.25); }
+.code-head .controls .minimize { background: #FEBC2E; box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.25); }
+.code-head .controls .zoom { background: #28C840; box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.25); }
+
+/* Fond personnalisé : la carte se détache, le texte suit la clarté du fond. */
+.board.custom-bg .code-card { border-color: rgba(0, 0, 0, 0.55); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28); }
+.board.on-dark .head h1 { color: #FFFFFF; text-shadow: 3px 3px 0 var(--accent), -2px -2px 0 var(--accent-2); }
+.board.on-dark .head h1 .second { color: var(--accent); text-shadow: 3px 3px 0 #000000, -2px -2px 0 var(--accent-2); }
+.board.on-dark .head p,
+.board.on-dark .shot-foot,
+.board.on-dark .brand span { color: rgba(255, 255, 255, 0.78); }
+.board.on-dark .brand,
+.board.on-dark .notes .note p { color: #FFFFFF; }
+
+/* Mode cadre, à la ray.so : la carte seule, centrée sur son fond. */
+.board.shot.frame { padding: 72px; }
+.board.shot.frame .shot-body { display: block; }
