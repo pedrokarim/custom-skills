@@ -1,0 +1,44 @@
+/*
+ * Thème des planches : la seule feuille à modifier pour une autre marque.
+ *
+ * Par défaut, une sérigraphie à deux encres : papier crème, encre noire, une encre chaude
+ * (accent) et une encre froide (accent-2). Pour une marque, remplacer les couleurs et les
+ * polices ici, et le <link> Google Fonts en tête de chaque planche si les polices changent.
+ */
+:root {
+  /* Papier et encre. */
+  --paper: #F4EDE4;
+  --card: #FBF7F1;
+  --ink: #1A1A1A;
+  --muted: #5d574f;
+  --line: #d9cfc2;
+  --zone-line: #b9ad9e;
+
+  /* Encre chaude : nœuds forts, numéros, premier flux. */
+  --accent: #E67260;
+  --accent-line: #D9604D;   /* un ton plus sombre : un trait fin doit rester lisible sur le papier */
+  --accent-ink: #B9503F;    /* texte posé sur le papier */
+  --on-accent: #1A1A1A;
+  --on-accent-muted: #3b211b;
+
+  /* Encre froide : second flux, nœuds « temps réel » ou « sortie ». */
+  --accent-2: #5865F2;
+  --accent-2-line: #5865F2;
+  --accent-2-ink: #3F49C9;
+  --on-accent-2: #FFFFFF;
+  --on-accent-2-muted: #dfe2ff;
+  --accent-2-rule: #7983f5;
+
+  /* Nœud imprimé en encre pleine. */
+  --on-solid: #F4EDE4;
+  --on-solid-muted: #cfc6ba;
+  --solid-rule: #3a3733;
+
+  /* Traits secondaires et état « bon ». */
+  --muted-line: #8a8176;
+  --ok: #3E8E63;
+
+  /* Typographie : deux familles, pas plus. Jamais de monospace hors vrai code. */
+  --font-title: "Archivo Black", "Arial Black", sans-serif;
+  --font-text: "Manrope", "Segoe UI", sans-serif;
+}

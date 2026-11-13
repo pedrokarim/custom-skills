@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="kit.css">
+<style>
+  .r2 { height: 150px; }
+  .wide { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr); gap: 28px; padding: 16px 20px; }
+  .wide h4 { font-size: 13px; font-weight: 800; color: var(--accent); }
+  .wide div + div { padding-left: 24px; border-left: 1.5px solid var(--solid-rule); }
+  .side dl { margin-top: 10px; display: grid; gap: 11px; }
+  .side dt { font-size: 13px; font-weight: 800; color: var(--accent-ink); }
+  .side dd { margin-top: 1px; font-size: 13.5px; line-height: 1.4; }
+</style>
+</head>
+<body>
+<!--
+  Gabarit « zones » : l'architecture d'ensemble. Les zones en pointillés sont des réalités
+  (une machine, un réseau, un fournisseur), jamais des cadres décoratifs. Une rangée d'entrées
+  en haut, les services au milieu, un nœud central large, les données en bas, la liste des
+  services extérieurs à droite.
+  Pour viser le centre d'un nœud large : to2 = (x du centre visé - left du nœud) / largeur.
+-->
+<div class="board" style="--w:1600px; --h:1020px">
+  <div class="head">
+    <h1>Trois clients,<br><span class="second">une seule API</span></h1>
+    <p>Le site, l'application mobile et l'outil interne ne touchent jamais la base : tout passe par l'API. Les travaux longs partent dans une file.</p>
+  </div>
+
+  <div class="stage">
+    <div class="zone" data-id="appzone" style="left:44px; top:388px; width:1062px; height:412px"><span class="zone-label" style="left:236px"><b>Hébergement</b> · conteneurs</span></div>
+    <div class="zone" data-id="datazone" style="left:440px; top:842px; width:666px; height:126px"><span class="zone-label"><b>Données</b> · service managé</span></div>
+
+    <div class="node" data-id="cdn" style="left:70px; top:236px; width:162px"><h3>CDN</h3><p>HTTPS et cache.</p></div>
+    <div class="node" data-id="mobile" style="left:494px; top:236px; width:162px"><h3>Mobile</h3><p>iOS et Android.</p></div>
+    <div class="node" data-id="staff" style="left:918px; top:236px; width:162px"><h3>Équipe</h3><p>Outil interne.</p></div>
+
+    <div class="node r2" data-id="web" style="left:70px; top:420px; width:162px"><h3>Site</h3><p>Rendu côté serveur.</p></div>
+    <div class="node r2" data-id="cache" style="left:282px; top:420px; width:162px"><h3>Cache</h3><p>Sessions et limites de débit.</p></div>
+    <div class="node r2" data-id="bff" style="left:494px; top:420px; width:162px"><h3>Passerelle</h3><p>Regroupe les appels de l'application mobile.</p></div>
+    <div class="node r2 accent-2" data-id="worker" style="left:706px; top:420px; width:162px"><h3>Ouvriers</h3><p>Exports, e-mails, vignettes.</p></div>
+    <div class="node r2" data-id="admin" style="left:918px; top:420px; width:162px"><h3>Back-office</h3><p>Droits par rôle.</p></div>
+
+    <div class="node solid wide" data-id="api" style="left:70px; top:634px; width:1010px">
+      <div><h3>API</h3><p>La seule porte vers la base, et le seul endroit où se décide une règle.</p></div>
+      <div><h4>Ce qu'elle reçoit</h4><p>Les appels des trois clients et les webhooks des prestataires.</p></div>
+      <div><h4>Ce qu'elle lance</h4><p>Les tâches longues, publiées dans la file des ouvriers.</p></div>
+    </div>
+
+    <div class="node" data-id="db" style="left:470px; top:868px; width:610px"><h3>Base relationnelle</h3><p>Réplique en lecture, sauvegarde chaque nuit.</p></div>
+
+    <div class="node side" data-id="ext" style="left:1150px; top:236px; width:386px">
+      <h3>Services appelés</h3>
+      <dl>
+        <div><dt>Paiement</dt><dd>Un prestataire, par webhook signé</dd></div>
+        <div><dt>E-mail</dt><dd>Envoi transactionnel</dd></div>
+        <div><dt>Cartes</dt><dd>Géocodage des adresses</dd></div>
+        <div><dt>Mesure</dt><dd>Audience, sans cookie tiers</dd></div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="brand"><span>Gabarit zones</span></div>
+</div>
+
+<script>
+  const center = (x) => (x - 70) / 1010;
+  window.WIRES = [
+    { from: 'cdn', fs: 'b', to: 'web', ts: 't', label: 'HTTPS', lo: [8, 0], la: 'start' },
+    { from: 'mobile', fs: 'b', to: 'bff', ts: 't', label: 'REST', lo: [8, 0], la: 'start' },
+    { from: 'staff', fs: 'b', to: 'admin', ts: 't', label: 'SSO', lo: [8, 0], la: 'start' },
+    { from: 'web', fs: 'b', to: 'api', ts: 't', to2: center(151), both: true },
+    { from: 'cache', fs: 'b', to: 'api', ts: 't', to2: center(363), both: true, color: 'accent' },
+    { from: 'bff', fs: 'b', to: 'api', ts: 't', to2: center(575), both: true },
+    { from: 'api', fs: 't', fo: center(787), to: 'worker', ts: 'b', color: 'accent2', label: 'file', lo: [8, 4], la: 'start' },
+    { from: 'admin', fs: 'b', to: 'api', ts: 't', to2: center(999) },
+    { from: 'api', fs: 'b', fo: center(775), to: 'db', ts: 't', to2: (775 - 470) / 610, label: 'SQL', lp: 0.25, lo: [8, 4], la: 'start' },
+    { from: 'api', fs: 'r', to: 'ext', ts: 'l', to2: 0.75 },
+  ];
+  window.LEGEND = [
+    { color: 'ink', label: 'requêtes' },
+    { color: 'accent', label: 'cache' },
+    { color: 'accent2', label: 'tâches de fond' },
+  ];
+</script>
+<script src="wire.js"></script>
+</body>
+</html>

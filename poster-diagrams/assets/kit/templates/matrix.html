@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Tableau croisé</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="kit.css">
+<style>
+  .grid { display: grid; grid-template-columns: 150px minmax(0, 1fr) minmax(0, 1fr) 250px; column-gap: 28px; }
+  .grid > div { padding: 14px 0; border-top: 2px solid var(--ink); min-width: 0; }
+  .grid > .th { padding: 0 0 10px; border-top: none; font-weight: 800; font-size: 15px; }
+  .grid > .th span { font-weight: 600; color: var(--muted); }
+  .key b {
+    display: block;
+    font-family: var(--font-title);
+    font-weight: 400;
+    font-size: 34px;
+    line-height: 1;
+    color: var(--accent);
+    text-shadow: 2px 2px 0 var(--ink);
+  }
+  .key span { display: block; margin-top: 6px; font-size: 13px; font-weight: 600; color: var(--muted); }
+  .cell { font-size: 14px; line-height: 1.55; }
+  .cell i { font-style: normal; color: var(--muted); }
+  .cell .sep { color: var(--accent); font-weight: 800; padding: 0 3px; }
+</style>
+</head>
+<body>
+<!--
+  Gabarit « tableau croisé » : une clé par ligne (fréquence, niveau, étape) en grand chiffre,
+  des colonnes par acteur, des éléments séparés par un point. Pour un inventaire dense
+  (tâches planifiées, permissions, formats). Une case vide reste vide, sans « aucun ».
+  Les durées entre parenthèses passent en gris et ne se coupent jamais.
+-->
+<div class="board" style="--w:1600px; --h:900px">
+  <div class="head">
+    <h1>Ce qui tourne<br><span class="second">la nuit</span></h1>
+    <p>Les tâches planifiées d'une boutique en ligne, rangées par fréquence et par processus. Un seul verrou les empêche de passer deux fois.</p>
+  </div>
+
+  <div class="stage">
+    <div class="node bare grid" data-id="table" id="table" style="left:64px; top:236px; width:1472px"></div>
+    <div class="facts" style="left:64px; top:740px; width:1472px">
+      <div class="node bare" data-id="f1"><h3>Un verrou partagé</h3><p>Chaque tâche prend un bail avant de passer : deux serveurs ne font jamais le même travail.</p></div>
+      <div class="node bare" data-id="f2"><h3>Rejouable</h3><p>Une tâche interrompue reprend où elle s'était arrêtée, sans doubler un envoi.</p></div>
+      <div class="node bare" data-id="f3"><h3>Un interrupteur</h3><p>Chaque tâche se coupe depuis l'administration, sans redéployer.</p></div>
+    </div>
+  </div>
+
+  <div class="brand"><span>Gabarit tableau croisé</span></div>
+</div>
+
+<script>
+  const COLUMNS = [['API', 'verrou partagé'], ['Ouvriers', 'file de tâches'], ['Serveur', 'cron système']];
+  const ROWS = [
+    ['1 min', 'chaque minute', ['paniers abandonnés', 'stocks des fournisseurs'], ['vignettes en attente (30 s)', 'envois d\'e-mails'], []],
+    ['1 h', 'toutes les heures', ['prix promotionnels', 'liens de paiement expirés'], ['index de recherche'], []],
+    ['24 h', 'une fois par jour', ['factures du mois', 'comptes à effacer'], [], ['sauvegarde de la base, à 3 h', 'rotation des journaux']],
+  ];
+
+  const sep = '<span class="sep">·</span>';
+  // Espaces insécables dans les durées et avant les deux-points.
+  const fmt = (items) =>
+    items
+      .map((t) => t.replace(/ :/g, ' :').replace(/\(([^)]+)\)/, (_, d) => `<i>(${d.replace(/ /g, ' ')})</i>`))
+      .join(` ${sep} `);
+  let html = '<div class="th"></div>' + COLUMNS.map(([n, d]) => `<div class="th">${n} <span>· ${d}</span></div>`).join('');
+  for (const [key, detail, ...cells] of ROWS) {
+    html += `<div class="key"><b>${key}</b><span>${detail}</span></div>`;
+    html += cells.map((items) => `<div class="cell">${fmt(items)}</div>`).join('');
+  }
+  document.getElementById('table').innerHTML = html;
+</script>
+<script src="wire.js"></script>
+</body>
+</html>

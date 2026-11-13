@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Deux boucles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="kit.css">
+<style>
+  .col { height: 262px; }
+</style>
+</head>
+<body>
+<!--
+  Gabarit « colonnes » : des acteurs alignés de gauche à droite, et des allers-retours
+  numérotés entre eux. Pour raconter un échange (une requête et sa réponse, un état qui remonte).
+  Les fils numérotés se lisent comme une séquence ; une seconde boucle prend l'autre encre.
+-->
+<div class="board" style="--w:1600px; --h:780px">
+  <div class="head">
+    <h1>Un paiement,<br><span class="second">de bout en bout</span></h1>
+    <p>Le site ne voit jamais la carte bancaire. Il crée une intention de paiement, le prestataire s'occupe du reste, et la confirmation arrive par un webhook signé.</p>
+  </div>
+
+  <div class="stage">
+    <div class="node col" data-id="web" style="left:64px; top:300px; width:220px">
+      <h3>Le site</h3>
+      <p>affiche le formulaire du prestataire et attend la confirmation.</p>
+      <div class="tech">Vue 3</div>
+    </div>
+    <div class="node col solid" data-id="api" style="left:377px; top:300px; width:220px">
+      <h3>API</h3>
+      <p>crée l'intention, vérifie la signature du webhook, crédite la commande.</p>
+      <div class="tech">Node · Fastify</div>
+    </div>
+    <div class="node col" data-id="psp" style="left:690px; top:300px; width:220px">
+      <h3>Prestataire</h3>
+      <p>encaisse, applique 3-D Secure, notifie le résultat.</p>
+      <div class="tech">API REST</div>
+    </div>
+    <div class="node col" data-id="db" style="left:1003px; top:300px; width:220px">
+      <h3>Base</h3>
+      <p>commandes et journal des paiements, jamais une carte.</p>
+      <div class="tech">PostgreSQL</div>
+    </div>
+    <div class="node col accent-2" data-id="mail" style="left:1316px; top:300px; width:220px">
+      <h3>E-mail</h3>
+      <p>le reçu part quand la commande est créditée.</p>
+      <div class="tech">file d'envoi</div>
+    </div>
+  </div>
+
+  <div class="brand"><span>Gabarit colonnes</span></div>
+</div>
+
+<script>
+  window.WIRES = [
+    { from: 'web', fs: 'r', fo: 0.2, to: 'api', ts: 'l', to2: 0.2, color: 'accent', label: '1. commande' },
+    { from: 'api', fs: 'r', fo: 0.2, to: 'psp', ts: 'l', to2: 0.2, color: 'accent', label: '2. intention' },
+    { from: 'psp', fs: 'l', fo: 0.36, to: 'api', ts: 'r', to2: 0.36, color: 'accent', label: '3. secret', lo: [0, 18] },
+    { from: 'api', fs: 'l', fo: 0.36, to: 'web', ts: 'r', to2: 0.36, color: 'accent', label: '4. formulaire', lo: [0, 18] },
+    { from: 'psp', fs: 'b', to: 'api', ts: 'b', color: 'accent2', viaY: 616, label: 'webhook signé : paiement réussi', lo: [0, 20] },
+    { from: 'api', fs: 'r', fo: 0.72, to: 'psp', ts: 'l', to2: 0.72, color: 'muted', dash: true, label: 'vérifie' },
+    { from: 'db', fs: 'r', fo: 0.5, to: 'mail', ts: 'l', to2: 0.5, color: 'accent2' },
+    { from: 'api', fs: 't', to: 'db', ts: 't', viaY: 262, label: 'la commande passe à « payée »' },
+  ];
+  window.LEGEND = [
+    { color: 'accent', label: 'parcours du client' },
+    { color: 'accent2', label: 'confirmation' },
+    { color: 'muted', label: 'contrôle', dash: true },
+  ];
+</script>
+<script src="wire.js"></script>
+</body>
+</html>

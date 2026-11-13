@@ -1,0 +1,225 @@
+/*
+ * La structure des planches : en-tête, nœuds, zones, fils, légende, trame.
+ * Les couleurs et les polices viennent de theme.css ; ne pas en écrire ici.
+ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-text);
+  -webkit-font-smoothing: antialiased;
+  font-variant-numeric: tabular-nums;
+}
+
+/* La planche a une taille fixe en pixels : celle de l'export. */
+.board {
+  position: relative;
+  width: var(--w);
+  height: var(--h);
+  overflow: hidden;
+  background: var(--paper);
+  padding: 56px 64px 48px;
+}
+
+/* La trame de demi-teinte vit dans deux coins, jamais sous le texte. */
+.board::before,
+.board::after {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  pointer-events: none;
+  background-image: radial-gradient(circle, var(--accent) 1.6px, transparent 2px);
+  background-size: 11px 11px;
+  opacity: 0.35;
+  z-index: 0;
+}
+.board::before {
+  top: -150px;
+  right: -150px;
+  mask-image: radial-gradient(circle at 70% 30%, #000 0%, transparent 62%);
+}
+.board::after {
+  bottom: -170px;
+  left: -170px;
+  background-image: radial-gradient(circle, var(--accent-2) 1.6px, transparent 2px);
+  mask-image: radial-gradient(circle at 30% 70%, #000 0%, transparent 62%);
+}
+.board.no-halftone::before,
+.board.no-halftone::after { display: none; }
+
+.board > * { position: relative; z-index: 1; }
+
+/* En-tête : le seul moment fort de la planche. */
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 48px;
+  margin-bottom: 36px;
+}
+.head h1 {
+  font-family: var(--font-title);
+  font-weight: 400;
+  font-size: 52px;
+  line-height: 1.06;
+  letter-spacing: -0.5px;
+  padding-bottom: 4px;
+  text-shadow: 3px 3px 0 var(--accent), -2px -2px 0 var(--accent-2);
+}
+.head h1 .second { color: var(--accent); text-shadow: 3px 3px 0 var(--ink), -2px -2px 0 var(--accent-2); }
+.head p {
+  max-width: 560px;
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* Signature en pied de planche (logo et nom), facultative. */
+.brand {
+  position: absolute;
+  right: 64px;
+  bottom: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-title);
+  font-size: 15px;
+}
+.brand img { width: 26px; height: 26px; border-radius: 50%; }
+.brand span { font-family: var(--font-text); font-weight: 600; font-size: 14px; color: var(--muted); }
+
+/* La scène : nœuds posés en absolu, fils dessinés par wire.js. */
+.stage { position: absolute; inset: 0; }
+
+.node {
+  position: absolute;
+  background: var(--card);
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  padding: 14px 16px;
+  min-width: 0;
+}
+.node h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 800;
+  font-size: 17px;
+  line-height: 1.2;
+}
+.node h3 svg, .node h3 img { width: 20px; height: 20px; flex: none; }
+.node p { margin-top: 5px; font-size: 13.5px; line-height: 1.4; color: var(--muted); }
+.node ul { margin-top: 8px; list-style: none; display: grid; gap: 4px; }
+.node li { font-size: 13.5px; line-height: 1.35; }
+.node li b { font-weight: 700; }
+.node li span { color: var(--muted); }
+
+/* Variantes : encre pleine, encre chaude, encre froide, pointillés, sans cadre. */
+.node.solid { background: var(--ink); color: var(--on-solid); }
+.node.solid p, .node.solid li span { color: var(--on-solid-muted); }
+.node.accent { background: var(--accent); color: var(--on-accent); }
+.node.accent p, .node.accent li span { color: var(--on-accent-muted); }
+.node.accent-2 { background: var(--accent-2); color: var(--on-accent-2); }
+.node.accent-2 p, .node.accent-2 li span { color: var(--on-accent-2-muted); }
+.node.ghost { background: transparent; border-style: dashed; }
+.node.bare { background: none; border: none; padding: 0; border-radius: 0; }
+
+/* Pied de nœud : la techno, sous un filet fin (structure interne, pas décor). */
+.node .tech {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1.5px solid var(--line);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.node.solid .tech { border-top-color: var(--solid-rule); color: var(--on-solid-muted); }
+.node.accent-2 .tech { border-top-color: var(--accent-2-rule); color: var(--on-accent-2-muted); }
+.node.col { display: flex; flex-direction: column; }
+
+/* Liste numérotée dans un nœud (une chaîne, un ordre de passage). */
+.node.steps { padding: 18px 0 10px; }
+.node.steps > h3 { padding: 0 20px; }
+.node.steps ol { list-style: none; margin-top: 14px; display: grid; }
+.node.steps li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  padding: 11px 20px;
+  border-top: 1.5px solid var(--line);
+}
+.node.solid.steps li { border-top-color: var(--solid-rule); }
+.node.steps li .n { font-family: var(--font-title); font-size: 22px; line-height: 1; color: var(--accent); }
+.node.steps li b { display: block; font-size: 15px; font-weight: 800; }
+.node.steps li span { display: block; margin-top: 2px; font-size: 13.5px; line-height: 1.35; }
+
+/* Zone : un regroupement réel (machine, réseau, application), jamais un décor. */
+.zone {
+  position: absolute;
+  border: 2px dashed var(--zone-line);
+  border-radius: 18px;
+}
+.zone > .zone-label {
+  position: absolute;
+  top: -13px;
+  left: 18px;
+  padding: 0 8px;
+  background: var(--paper);
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 24px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.zone > .zone-label b { color: var(--ink); }
+
+/* Pastille d'étape posée sur un fil ou un nœud. */
+.step {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--ink);
+  font-family: var(--font-title);
+  font-size: 14px;
+  line-height: 26px;
+  text-align: center;
+  color: var(--on-accent);
+  z-index: 3;
+}
+
+/* Fils. */
+svg.wires { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; overflow: visible; pointer-events: none; }
+svg.wires path { fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+svg.wires text {
+  font-family: var(--font-text);
+  font-size: 12.5px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: var(--paper);
+  stroke-width: 6px;
+  stroke-linejoin: round;
+}
+
+/* Trois encarts de conclusion en pied de planche. */
+.facts { position: absolute; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px; }
+.facts .node { position: static; }
+.facts h3 { font-weight: 800; font-size: 16px; }
+.facts p { margin-top: 5px; font-size: 13.5px; line-height: 1.45; color: var(--muted); }
+
+/* Légende en pied de planche. */
+.legend {
+  position: absolute;
+  left: 64px;
+  bottom: 22px;
+  display: flex;
+  gap: 26px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.legend > div { display: flex; align-items: center; gap: 8px; }
+.legend svg { width: 34px; height: 10px; }

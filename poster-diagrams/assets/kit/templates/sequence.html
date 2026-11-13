@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Séquence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="kit.css">
+<style>
+  .actor { height: 78px; text-align: center; }
+  .actor h3 { justify-content: center; }
+  .anchor { position: absolute; width: 0; height: 0; }
+  .note { padding: 7px 12px; border-radius: 10px; border-width: 1.5px; }
+  .note p { margin: 0; font-size: 12.5px; line-height: 1.35; color: var(--ink); }
+  .node.bare.section { font-weight: 800; font-size: 14px; color: var(--muted); background: var(--paper); padding-right: 10px; }
+  svg.lifelines { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+</style>
+</head>
+<body>
+<!--
+  Gabarit « séquence » : des acteurs en colonnes, une ligne de vie sous chacun, des messages
+  numérotés de haut en bas. Pour une connexion, un paiement, une poignée de main entre services.
+  ACTORS : colonnes ; MESSAGES : dans l'ordre, chaque entrée est
+    { from, to, label, color }              un message (numéroté automatiquement)
+    { note, on, color? }                    une note posée sur la ligne de vie d'un acteur
+    { section }                             un intertitre qui coupe la séquence
+-->
+<div class="board" style="--w:1600px; --h:900px">
+  <div class="head">
+    <h1>Se connecter<br><span class="second">sans mot de passe</span></h1>
+    <p>Une connexion par un fournisseur d'identité : le site ne voit jamais de mot de passe, et l'API vérifie elle-même l'identité au lieu de croire ce qu'on lui envoie.</p>
+  </div>
+  <div class="stage" id="stage"></div>
+  <div class="brand"><span>Gabarit séquence</span></div>
+</div>
+
+<script>
+  const ACTORS = [
+    { id: 'browser', title: 'Navigateur', sub: 'le visiteur' },
+    { id: 'web', title: 'Serveur du site', sub: 'rendu et session' },
+    { id: 'idp', title: 'Fournisseur', sub: 'OAuth 2' },
+    { id: 'api', title: 'API', sub: 'règles et données', cls: 'solid' },
+    { id: 'db', title: 'Base', sub: 'comptes' },
+  ];
+  const MESSAGES = [
+    { from: 'browser', to: 'web', label: 'Se connecter' },
+    { from: 'web', to: 'idp', label: 'demande d\'autorisation' },
+    { from: 'idp', to: 'web', label: 'code, puis jetons', color: 'accent' },
+    { from: 'web', to: 'api', label: 'jetons du fournisseur', color: 'accent' },
+    { from: 'api', to: 'idp', label: 'qui est-ce ?' },
+    { note: 'L\'identité vient du fournisseur, jamais du client.', on: 'api' },
+    { from: 'api', to: 'db', label: 'compte créé ou mis à jour' },
+    { from: 'api', to: 'web', label: 'jeton de l\'API', color: 'accent2' },
+    { from: 'web', to: 'browser', label: 'cookie de session', color: 'accent2' },
+    { section: 'Ensuite, à chaque appel' },
+    { from: 'browser', to: 'api', label: 'requête avec le jeton', color: 'accent2' },
+  ];
+
+  const TOP = 236;            // haut des acteurs
+  const ACTOR_HEIGHT = 78;
+  const FIRST = 360;          // premier message
+  const STEP = 46;            // écart entre deux messages
+  const NOTE_STEP = 64;
+  const SECTION_STEP = 58;
+  const LEFT = 64;
+  const WIDTH = 1472;
+  const ACTOR_WIDTH = 220;
+
+  const stage = document.getElementById('stage');
+  const gap = (WIDTH - ACTOR_WIDTH * ACTORS.length) / (ACTORS.length - 1);
+  const centerOf = {};
+  ACTORS.forEach((a, i) => {
+    const left = LEFT + i * (ACTOR_WIDTH + gap);
+    centerOf[a.id] = left + ACTOR_WIDTH / 2;
+    const el = document.createElement('div');
+    el.className = `node actor${a.cls ? ` ${a.cls}` : ''}`;
+    el.dataset.id = a.id;
+    el.style.cssText = `left:${left}px; top:${TOP}px; width:${ACTOR_WIDTH}px`;
+    el.innerHTML = `<h3>${a.title}</h3>${a.sub ? `<p>${a.sub}</p>` : ''}`;
+    stage.appendChild(el);
+  });
+
+  const anchor = (id, x, y) => {
+    const el = document.createElement('div');
+    el.className = 'anchor';
+    el.dataset.id = id;
+    el.style.cssText = `left:${x}px; top:${y}px`;
+    stage.appendChild(el);
+  };
+
+  window.WIRES = [];
+  let y = FIRST;
+  let n = 0;
+  for (const m of MESSAGES) {
+    if (m.section) {
+      y += SECTION_STEP - STEP;
+      const el = document.createElement('div');
+      el.className = 'node bare section';
+      el.dataset.id = `section${y}`;
+      el.style.cssText = `left:${LEFT}px; top:${y - 30}px`;
+      el.textContent = m.section;
+      stage.appendChild(el);
+      y += 12;
+      continue;
+    }
+    if (m.note) {
+      const el = document.createElement('div');
+      el.className = `node note${m.color ? ` ${m.color}` : ''}`;
+      el.dataset.id = `note${y}`;
+      el.style.cssText = `left:${centerOf[m.on] - 130}px; top:${y - 22}px; width:260px`;
+      el.innerHTML = `<p>${m.note}</p>`;
+      stage.appendChild(el);
+      y += NOTE_STEP;
+      continue;
+    }
+    n++;
+    const x1 = centerOf[m.from];
+    const x2 = centerOf[m.to];
+    anchor(`m${n}a`, x1, y);
+    anchor(`m${n}b`, x2, y);
+    const right = x2 > x1;
+    window.WIRES.push({
+      from: `m${n}a`, fs: right ? 'r' : 'l',
+      to: `m${n}b`, ts: right ? 'l' : 'r',
+      color: m.color || 'ink',
+      label: `${n}. ${m.label}`,
+      lp: 0.5, lo: [0, -8],
+    });
+    y += STEP;
+  }
+  const bottom = y - STEP + 34;
+
+  // Lignes de vie : sous chaque acteur, jusqu'au dernier message.
+  const line = getComputedStyle(document.documentElement).getPropertyValue('--zone-line').trim();
+  let svg = '<svg class="lifelines" xmlns="http://www.w3.org/2000/svg">';
+  for (const a of ACTORS) {
+    svg += `<line x1="${centerOf[a.id]}" y1="${TOP + ACTOR_HEIGHT}" x2="${centerOf[a.id]}" y2="${bottom}" stroke="${line}" stroke-width="2" stroke-dasharray="6 6"/>`;
+  }
+  svg += '</svg>';
+  stage.insertAdjacentHTML('afterbegin', svg);
+
+  window.LEGEND = [
+    { color: 'ink', label: 'demande' },
+    { color: 'accent', label: 'jetons du fournisseur' },
+    { color: 'accent2', label: 'jeton de l\'API' },
+  ];
+</script>
+<script src="wire.js"></script>
+</body>
+</html>

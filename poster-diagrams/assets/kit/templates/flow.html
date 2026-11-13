@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Chaîne de traitement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="kit.css">
+</head>
+<body>
+<!--
+  Gabarit « flux » : une entrée, une chaîne d'étapes numérotées, des services sur le côté,
+  une sortie. Pour raconter « ce qui arrive à une demande ».
+  Chaque ligne de la chaîne porte un data-id : un fil peut partir d'une étape précise.
+-->
+<div class="board" style="--w:1600px; --h:960px">
+  <div class="head">
+    <h1>D'une image envoyée<br><span class="second">à sa vignette</span></h1>
+    <p>Un fichier traverse quatre étapes. Chacune peut refuser, et la suivante ne démarre que si la précédente a réussi. Le travail lourd se fait hors de la requête.</p>
+  </div>
+
+  <div class="stage">
+    <div class="node" data-id="client" style="left:64px; top:236px; width:236px">
+      <h3>Le navigateur</h3>
+      <p>envoie le fichier et reçoit aussitôt un numéro de suivi.</p>
+    </div>
+
+    <div class="node solid steps" data-id="chain" style="left:372px; top:226px; width:540px">
+      <h3>Chaîne de traitement</h3>
+      <ol>
+        <li data-id="s1"><span class="n">1</span><div><b>Contrôle</b><span>Type, poids, dimensions. Un fichier refusé ne coûte rien de plus.</span></div></li>
+        <li data-id="s2"><span class="n">2</span><div><b>Stockage brut</b><span>L'original part dans le stockage objet, sous un nom unique.</span></div></li>
+        <li data-id="s3"><span class="n">3</span><div><b>Mise en file</b><span>Une tâche « vignette » est publiée pour les ouvriers.</span></div></li>
+        <li data-id="s4"><span class="n">4</span><div><b>Vignettes</b><span>Trois tailles en WebP, puis l'état passe à « prêt ».</span></div></li>
+      </ol>
+    </div>
+
+    <div class="node accent" data-id="storage" style="left:1000px; top:236px; width:280px">
+      <h3>Stockage objet</h3>
+      <p>Les originaux et les vignettes, servis par le CDN.</p>
+    </div>
+
+    <div class="node accent-2" data-id="queue" style="left:1000px; top:430px; width:280px">
+      <h3>File de tâches</h3>
+      <p>Les ouvriers prennent une tâche à la fois et la rendent s'ils tombent.</p>
+    </div>
+
+    <div class="node" data-id="db" style="left:1000px; top:640px; width:280px">
+      <h3>Base de données</h3>
+      <p>L'état de chaque fichier, lu par le numéro de suivi.</p>
+    </div>
+
+    <div class="node ghost" data-id="cdn" style="left:1340px; top:236px; width:196px">
+      <h3>CDN</h3>
+      <p>Les vignettes, au plus près de l'écran.</p>
+    </div>
+  </div>
+
+  <div class="brand"><span>Gabarit flux</span></div>
+</div>
+
+<script>
+  window.WIRES = [
+    { from: 'client', fs: 'r', fo: 0.4, to: 'chain', ts: 'l', to2: 0.2 },
+    { from: 's2', fs: 'r', to: 'storage', ts: 'l', to2: 0.6, color: 'accent' },
+    { from: 's3', fs: 'r', to: 'queue', ts: 'l', to2: 0.4, color: 'accent2' },
+    { from: 's4', fs: 'r', to: 'db', ts: 'l', to2: 0.4, mid: 0.4 },
+    { from: 'queue', fs: 'b', to: 'db', ts: 't', color: 'accent2', label: 'état « prêt »', lo: [10, 4], la: 'start' },
+    { from: 'storage', fs: 'r', to: 'cdn', ts: 'l', color: 'muted', dash: true },
+  ];
+  window.LEGEND = [
+    { color: 'ink', label: 'requête' },
+    { color: 'accent', label: 'fichier' },
+    { color: 'accent2', label: 'tâche de fond' },
+  ];
+</script>
+<script src="wire.js"></script>
+</body>
+</html>

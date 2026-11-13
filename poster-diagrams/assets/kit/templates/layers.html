@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Couches</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="kit.css">
+<style>
+  .layer { display: grid; grid-template-columns: 52px 250px minmax(0, 1fr); gap: 0 22px; align-items: start; padding: 16px 22px; }
+  .layer .n { font-family: var(--font-title); font-size: 30px; line-height: 1; color: var(--accent); }
+  .layer.solid .n { color: var(--accent); }
+  .layer h3 { font-size: 18px; }
+  .layer .what { margin-top: 4px; font-size: 13.5px; line-height: 1.4; color: var(--muted); }
+  .layer.solid .what { color: var(--on-solid-muted); }
+  .layer .items { font-size: 14px; line-height: 1.55; }
+  .layer .items .sep { color: var(--accent); font-weight: 800; padding: 0 3px; }
+</style>
+</head>
+<body>
+<!--
+  Gabarit « couches » : des étages empilés qu'une demande traverse de haut en bas, la réponse
+  remontant de l'autre côté. Pour un framework, un protocole, une pile logicielle.
+  Une couche par ligne : numéro, nom et rôle, puis ce qu'elle contient. Une seule couche en
+  encre pleine : celle où se joue l'essentiel.
+-->
+<div class="board" style="--w:1600px; --h:920px">
+  <div class="head">
+    <h1>Une requête,<br><span class="second">couche par couche</span></h1>
+    <p>Ce que traverse une requête HTTP dans une API classique. Chaque couche peut répondre seule et arrêter la descente : un refus coûte d'autant moins qu'il arrive tôt.</p>
+  </div>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="brand"><span>Gabarit couches</span></div>
+</div>
+
+<script>
+  const LAYERS = [
+    ['Réseau', 'Le premier filtre, avant le code.', ['TLS', 'pare-feu applicatif', 'limite de débit par adresse']],
+    ['Routage', 'Trouve qui doit répondre.', ['table des routes', 'versions de l\'API', '404 immédiat']],
+    ['Garde', 'Décide si la demande a le droit de passer.', ['session', 'rôle', 'quota du compte', 'validation du corps']],
+    ['Métier', 'Applique la règle, et seulement elle.', ['commande', 'stock', 'prix', 'remise'], true],
+    ['Données', 'Lit et écrit, en une transaction.', ['requêtes', 'cache', 'journal des changements']],
+  ];
+  const TOP = 236;
+  const HEIGHT = 96;
+  const GAP = 30;
+  const LEFT = 150;
+  const WIDTH = 1236;
+  const sep = '<span class="sep">·</span>';
+  const stage = document.getElementById('stage');
+  LAYERS.forEach(([name, what, items, strong], i) => {
+    const el = document.createElement('div');
+    el.className = `node layer${strong ? ' solid' : ''}`;
+    el.dataset.id = `layer${i + 1}`;
+    el.style.cssText = `left:${LEFT}px; top:${TOP + i * (HEIGHT + GAP)}px; width:${WIDTH}px; height:${HEIGHT}px`;
+    el.innerHTML = `<span class="n">${i + 1}</span><div><h3>${name}</h3><p class="what">${what}</p></div><div class="items">${items.join(` ${sep} `)}</div>`;
+    stage.appendChild(el);
+  });
+
+  window.WIRES = [];
+  for (let i = 1; i < LAYERS.length; i++) {
+    window.WIRES.push({ from: `layer${i}`, fs: 'b', fo: 0.04, to: `layer${i + 1}`, ts: 't', to2: 0.04, color: 'accent' });
+    window.WIRES.push({ from: `layer${i + 1}`, fs: 't', fo: 0.96, to: `layer${i}`, ts: 'b', to2: 0.96, color: 'accent2' });
+  }
+  window.WIRES.push({ from: 'layer3', fs: 'l', fo: 0.5, to: 'layer1', ts: 'l', to2: 0.5, viaX: 96, color: 'muted', dash: true, label: 'refus\nanticipé', lp: 0.5, lo: [-12, -4], la: 'end' });
+  window.LEGEND = [
+    { color: 'accent', label: 'la demande descend' },
+    { color: 'accent2', label: 'la réponse remonte' },
+    { color: 'muted', label: 'refus avant le métier', dash: true },
+  ];
+</script>
+<script src="wire.js"></script>
+</body>
+</html>

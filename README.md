@@ -11,8 +11,10 @@ quand s’en servir, comment, pourquoi chaque étape existe, et les erreurs déj
 | Skill | À quoi il sert |
 |---|---|
 | [`custom-skills`](custom-skills/SKILL.md) | Le point d’entrée : connaît ce dépôt, sait y ajouter un skill ou en corriger un. Dans n’importe quel projet, « ajoute ça aux custom skills » suffit. |
+| [`code-shots`](code-shots/SKILL.md) | Des captures de code façon ray.so, faites maison et sans fausse fenêtre : trouver les extraits d’un projet qui racontent quelque chose, en tirer les lignes exactes, les mettre en page (coloration, lignes en avant, notes) et exporter en PNG et PDF. S’appuie sur `poster-diagrams` |
 | [`flat-pixel-art-scenes`](flat-pixel-art-scenes/SKILL.md) | Créer des scènes en pixel art à grands aplats, profondes et calmes, et les animer en boucle (fond de menu, GIF) |
 | [`no-ai-slop`](no-ai-slop/SKILL.md) | Concevoir ou relire une page, une maquette ou un visuel sans les tics des interfaces générées : catalogue des motifs refusés, composition des images à partir de l’officiel, script qui détecte ces motifs dans la page |
+| [`poster-diagrams`](poster-diagrams/SKILL.md) | Produire des schémas techniques composés comme des affiches (architecture, flux, pipeline, tâches planifiées, couches), tirés du vrai code, exportés en PNG et PDF avec leur fiche d’article : kit sans dépendance, six gabarits, contrôle automatique des débordements et des fils qui traversent un bloc |
 | [`site-indexing`](site-indexing/SKILL.md) | Faire indexer un site par Google et Bing : diagnostic dans la Search Console et Bing Webmaster Tools pilotées depuis Brave (MCP `brave`), vérifications sans navigateur (page, hreflang, robots.txt, sitemap échantillonné, avant / après déploiement), correctifs côté code, demandes d’indexation |
 
 ## Installation
