@@ -61,6 +61,9 @@ if (!chromePath) throw new Error('Navigateur Chromium introuvable : définir CHR
 
 const chrome = spawn(chromePath, [
   '--headless=new',
+  // Une planche plus haute que la fenêtre de départ ferait apparaître des barres de
+  // défilement, qui restent dans la capture : on les masque à l'export.
+  '--hide-scrollbars',
   '--remote-debugging-port=0',
   `--user-data-dir=${join(tmpdir(), 'poster-diagrams-chrome')}`,
   '--no-first-run',

@@ -133,6 +133,9 @@ Aperçus dans `assets/examples/`. Le détail de chacun (structure, réglages) es
 - **Planche mesurée trop tôt** : une planche construite en script (stations, couches, séquence,
   capture de code) n'a sa taille qu'après `boardReady`. `render.mjs` attend désormais le dessin
   avant de mesurer.
+- **Barres de défilement dans l'image** : une planche plus haute que la fenêtre de départ
+  (1000 px) les fait apparaître, en bas et à droite, et elles restent dans la capture.
+  `render.mjs` lance le navigateur avec `--hide-scrollbars`.
 - **PNG verrouillé sous Windows** (ouvert dans un aperçu, Obsidian, l'explorateur) : l'écriture
   échoue. `render.mjs` le signale (« fichier ouvert ailleurs ? ») et continue ; fermer l'aperçu
   ou rendre ailleurs avec `--out`.
