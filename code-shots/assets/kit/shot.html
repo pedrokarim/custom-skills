@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Capture de code</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="kit.css">
+<link rel="stylesheet" href="shot.css">
+</head>
+<body>
+<!--
+  Une capture de code. Tout se règle dans window.SHOT ci-dessous ; le code vient de
+  extract.mjs (lignes exactes du fichier, coupures « @@ n », indentation commune retirée).
+  Signature facultative : un .brand dans la planche est gardé tel quel.
+-->
+<div class="board">
+  <div class="brand"><span>Gabarit capture de code</span></div>
+</div>
+
+<script>
+  window.SHOT = {
+    title: 'Un verrou',
+    second: 'qui expire tout seul',
+    lede: 'Deux copies d\'un service tournent pendant un déploiement. Avant chaque passage, une tâche prend un bail : la première copie l\'obtient, l\'autre saute son tour.',
+    file: 'src/jobs/lease.ts',
+    lang: 'ts',
+    start: 12,
+    code: `const LEASE = \`
+  local n = redis.call('INCR', KEYS[1])
+  if n == 1 then redis.call('EXPIRE', KEYS[1], ARGV[1]) end
+  return n\`;
+
+export async function tryLease(redis: Redis, key: string, ttl: number) {
+  return (await redis.eval(LEASE, 1, key, ttl)) === 1;
+}
+@@ 40
+export async function runOnce(job: Job) {
+  if (!(await tryLease(redis, \`jobs:\${job.name}:lock\`, job.ttl))) return;
+  await job.run();
+}`,
+    focus: [13, 14, 41],
+    notes: [
+      { line: 14, text: 'Le **premier** appel reçoit 1 et pose l\'expiration ; les suivants reçoivent 2, 3…' },
+      { line: 41, text: 'Pas de déverrouillage : le bail **expire seul**, même si le service tombe en plein travail.' },
+    ],
+    foot: 'Exemple de gabarit',
+  };
+</script>
+<script src="shot.js"></script>
+</body>
+</html>

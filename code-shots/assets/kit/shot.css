@@ -1,0 +1,135 @@
+/*
+ * Les captures de code. S'appuie sur theme.css (couleurs, polices) et kit.css (planche,
+ * en-tête, signature) du skill poster-diagrams.
+ *
+ * Les couleurs de la coloration syntaxique sont des jetons : les changer ici ou dans
+ * theme.css suffit, shot.js les relit avant de colorer.
+ */
+:root {
+  --code-bg: var(--ink);
+  --code-fg: #EDE5DA;
+  --code-muted: #8f877c;
+  --code-rule: #34312d;
+  --code-line-number: #6f685f;
+  --code-focus-bg: rgba(230, 114, 96, 0.13);
+  --code-keyword: var(--accent);
+  --code-string: #AEB6FF;
+  --code-number: #AEB6FF;
+  --code-function: #F6D7B0;
+  --code-type: #F2A898;
+  --code-property: #E9E1D6;
+  --code-punctuation: #B7AEA2;
+  --code-comment: #8f877c;
+  --font-code: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+}
+
+.board.shot { height: auto; padding-bottom: 76px; }
+.board.shot .head { margin-bottom: 30px; }
+.board.shot .head h1 { font-size: 46px; }
+
+.shot-body { display: grid; gap: 36px; align-items: start; }
+.shot-body.with-notes { grid-template-columns: minmax(0, 1fr) 400px; }
+
+/* La carte du code : un vrai en-tête (chemin, lignes, langage), pas une fausse fenêtre. */
+.code-card {
+  position: relative;
+  min-width: 0;
+  background: var(--code-bg);
+  border: 2px solid var(--ink);
+  border-radius: 16px;
+  color: var(--code-fg);
+  overflow: hidden;
+}
+.code-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 16px 26px 14px;
+  border-bottom: 1.5px solid var(--code-rule);
+  font-family: var(--font-text);
+  font-size: 15px;
+  color: var(--code-muted);
+}
+.code-head b { color: var(--code-fg); font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+.code-head .lang { margin-left: auto; white-space: nowrap; }
+
+.code {
+  padding: 18px 0 20px;
+  font-family: var(--font-code);
+  font-size: var(--code-size, 19px);
+  line-height: 1.62;
+  font-variant-ligatures: none;
+  tab-size: 2;
+}
+.code .row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  padding-right: 56px;
+  white-space: pre;
+}
+.code .ln {
+  padding-right: 18px;
+  text-align: right;
+  color: var(--code-line-number);
+  user-select: none;
+}
+.code .src { min-width: 0; overflow: hidden; }
+.code.dim .row:not(.focus) .src { opacity: 0.42; }
+.code .row.focus { background: var(--code-focus-bg); }
+.code .row.focus .ln { color: var(--accent); }
+.code .row.gap .ln,
+.code .row.gap .src { color: var(--code-muted); font-family: var(--font-text); font-size: 15px; }
+
+/* Repère d'une note, au bout de la ligne qu'elle commente. */
+.code .mark {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  width: 28px;
+  height: 28px;
+  margin-top: -14px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--ink);
+  font-family: var(--font-title);
+  font-size: 13px;
+  line-height: 24px;
+  text-align: center;
+  color: var(--on-accent);
+  white-space: normal;
+}
+
+/* Les notes, alignées sur leur ligne. */
+.notes { position: relative; min-width: 0; }
+.notes .note {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+}
+.notes .note .n {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--ink);
+  font-family: var(--font-title);
+  font-size: 14px;
+  line-height: 26px;
+  text-align: center;
+  color: var(--on-accent);
+}
+.notes .note p { font-size: 15.5px; line-height: 1.45; color: var(--ink); padding-top: 3px; }
+.notes .note p b { font-weight: 800; }
+
+.shot-foot {
+  position: absolute;
+  left: 64px;
+  bottom: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+}
