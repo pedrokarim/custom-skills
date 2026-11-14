@@ -80,6 +80,11 @@ Le fond d'une bonne page tient à deux choses, qu'on règle **avant** le visuel�
 Écrire tous les textes et le plan d'abord, dans un fichier à côté de la maquette ; construire
 ensuite.
 
+Les tics d'écriture eux-mêmes (contrastes, séries de trois, mots-signatures, formules de
+chatbot, titres en « Pourquoi… ») relèvent du skill [`no-ai-writing`](../no-ai-writing/SKILL.md) :
+son catalogue vaut pour tout texte, et son script `tell-scan.mjs` les repère dans un fichier.
+Chaque texte d'une page passe par lui avant d'être posé.
+
 ## Concevoir à la place
 
 1. **Partir du contenu réel** : les vraies commandes, les vrais écrans, les vrais visuels du
@@ -176,7 +181,9 @@ Toute maquette ou page passe ce contrôle **avant** d'être montrée :
    correction dans le système existant, jamais un nouvel effet pour compenser.
 5. Relire le rythme sur la capture, section par section (`references/page-plan.md`) : écarts
    selon la parenté, aucun bouton ou titre orphelin, colonnes équilibrées.
-6. Lire chaque texte à voix haute (`references/copy.md`).
+6. Lire chaque texte à voix haute (`references/copy.md`), puis passer les textes de la page au
+   script de `no-ai-writing` (`node ../no-ai-writing/scripts/tell-scan.mjs textes.md`, ou la page
+   HTML compilée).
 
 ### Rendre une critique
 

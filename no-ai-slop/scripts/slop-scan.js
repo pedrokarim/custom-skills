@@ -265,16 +265,17 @@
   }
   for (const [text, n] of actions) if (n >= 3) out.repeatedAction.push(`« ${text} » ×${n}`);
 
-  // Tics de cadence des textes, en français : on compte, et on montre les premiers exemples.
+  // Tics de cadence des textes, en français : un seul suffit (règle du skill no-ai-writing, qui a
+  // le catalogue complet et son propre script, tell-scan.mjs).
   const body = document.body.innerText || "";
   const sample = (re) => [...body.matchAll(re)].map((m) => m[0].replace(/\s+/g, " ").trim().replace(/^[.!?]\s*/, "").slice(0, 60));
   const examples = (list) => list.slice(0, 3).map((t) => `« ${t} »`).join(", ");
   const dashes = (body.match(/—/g) || []).length;
-  if (dashes > 2) out.copyTics.push(`${dashes} tirets cadratins (—)`);
+  if (dashes) out.copyTics.push(`${dashes} tirets cadratins (—)`);
   const contrasts = sample(/\b(?:pas|non) (?:seulement|juste|simplement|qu['’]une?)\b[^.!?\n]{0,40}|\bpas\b[^.!?;\n]{1,50},? mais\b|\bplutôt que\b[^.!?\n]{0,30}|\bau lieu de\b[^.!?\n]{0,30}|\bce n['’]est pas\b[^.!?\n]{0,50}/gi);
-  if (contrasts.length > 2) out.copyTics.push(`${contrasts.length} contrastes « pas X, mais Y » : ${examples(contrasts)}`);
+  if (contrasts.length) out.copyTics.push(`${contrasts.length} contrastes « pas X, mais Y » : ${examples(contrasts)}`);
   const riders = sample(/, (?:permettant|garantissant|offrant|assurant|facilitant|aidant|rendant|apportant|renforçant|soulignant)\b[^.!?\n]{0,40}/gi);
-  if (riders.length > 2) out.copyTics.push(`${riders.length} queues en « -ant » : ${examples(riders)}`);
+  if (riders.length) out.copyTics.push(`${riders.length} queues en « -ant » : ${examples(riders)}`);
   const reveals = sample(/(?:^|[.!?]\s+)(?:Le résultat|La raison|Le secret|La différence|La suite|Et ensuite|Pourquoi c['’]est important)\s?[?:]/gim);
   if (reveals.length) out.copyTics.push(`révélations mises en scène : ${examples(reveals)}`);
   const negations = sample(/\b(?:Pas|Sans|Ni) [^.!?\n]{1,30}\.\s+(?:Pas|Sans|Ni) [^.!?\n]{1,30}\./g);
@@ -288,7 +289,7 @@
     if (/^(?:[^.?!…]{2,48}[.!] ){1,2}[^.?!…]{2,55}[.!]?$/.test(t) && t.split(" ").length <= 14) twoFragments.push(t);
     if (t.includes("!")) out.copyTics.push(`point d'exclamation dans un titre : « ${t.slice(0, 60)} »`);
   }
-  if (twoFragments.length >= 2) out.copyTics.push(`${twoFragments.length} titres en fragments : ${examples(twoFragments)}`);
+  if (twoFragments.length) out.copyTics.push(`${twoFragments.length} titres en fragments : ${examples(twoFragments)}`);
 
   for (const key of Object.keys(out)) {
     const list = [...new Set(out[key])];

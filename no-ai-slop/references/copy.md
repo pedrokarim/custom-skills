@@ -66,12 +66,15 @@ réel, sans figure de style.
 
 ## Tics de cadence
 
-Un texte généré se trahit autant par la forme de ses phrases que par ses mots.
+Un texte généré se trahit autant par la forme de ses phrases que par ses mots. Les règles
+ci-dessous sont celles qui pèsent le plus dans une interface ; le catalogue complet (48 tics,
+avec avant/après, en français et en anglais) et le script qui les repère sont dans le skill
+[`no-ai-writing`](../../no-ai-writing/SKILL.md).
 
 - **Le contraste « pas X, mais Y »** sous toutes ses formes (« pas seulement », « plutôt que »,
-  « au lieu de », « ce n'est pas… c'est ») : deux au plus par page, tous comptés ensemble. Dire Y
-  directement.
-- **Le titre en fragments** (« Douze modules. Une commande. ») : un par page au plus. Un nom, puis
+  « au lieu de », « ce n'est pas… c'est ») : aucun, sauf pour corriger une erreur que le
+  lecteur fait vraiment. Dire Y directement.
+- **Le titre en fragments** (« Douze modules. Une commande. ») : aucun. Un nom, puis
   une ligne d'affirmation dessous.
 - **La liste de négations** (« Pas de formulaire. Pas d'attente. ») : dire ce qu'il y a.
 - **La queue en « -ant »** (« …, permettant de », « garantissant ») : finir la phrase sur son fait.
