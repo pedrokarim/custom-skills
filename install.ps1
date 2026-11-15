@@ -51,6 +51,13 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repo = $PSScriptRoot.TrimEnd('\')
+
+# Windsurf ne lit que son propre dossier de skills : on l'alimente aussi, s'il est installé.
+# Copilot et Cursor lisent déjà ~/.claude/skills ou ~/.agents/skills.
+$windsurfSkills = Join-Path $HOME '.codeium\windsurf\skills'
+if (-not $PSBoundParameters.ContainsKey('Targets') -and (Test-Path -LiteralPath (Split-Path $windsurfSkills))) {
+    $Targets += $windsurfSkills
+}
 $problemCount = 0
 
 function Write-Problem([string] $message) {

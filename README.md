@@ -2,7 +2,8 @@
   <img src=".github/banner.svg" alt="custom-skills : des procédés éprouvés, écrits pour être refaits sans tâtonner" width="100%">
 </p>
 
-Une bibliothèque de skills pour agents de code (Claude Code, Codex et les agents compatibles).
+Une bibliothèque de skills pour agents de code : Claude Code, Codex, GitHub Copilot, Cursor,
+Windsurf et les agents compatibles.
 Chaque skill est un procédé qui a fonctionné une fois, écrit pour être refait sans tâtonner :
 quand s’en servir, comment, pourquoi chaque étape existe, et les erreurs déjà payées.
 
@@ -48,12 +49,14 @@ sh install.sh        # macOS, Linux
 Ajouter des noms pour n’installer que certains skills : `./install.ps1 site-indexing`.
 
 Le script relie chaque skill dans `~/.claude/skills` (Claude Code) et `~/.agents/skills`
-(Codex). Ce sont des **liens**, pas des copies : un skill modifié dans le dépôt est à jour
+(Codex), et dans `~/.codeium/windsurf/skills` si Windsurf est installé. GitHub Copilot et Cursor
+lisent déjà l’un de ces dossiers. Ce sont des **liens**, pas des copies : un skill modifié dans
+le dépôt est à jour
 partout, immédiatement, et un `git pull` suffit pour récupérer les nouveautés. On le relance
 après avoir ajouté, renommé ou supprimé un skill ; il vérifie aussi l’en-tête de chaque
 `SKILL.md`.
 
-Pour les autres agents (Cursor, Gemini CLI…), `npx skills add pedrokarim/custom-skills`
+Pour un agent qui ne lit aucun de ces dossiers, `npx skills add pedrokarim/custom-skills`
 installe les skills par copie.
 
 ### Avec les hooks (Claude Code)
@@ -61,7 +64,8 @@ installe les skills par copie.
 `./install.ps1 -Hooks` (ou `sh install.sh --hooks`) inscrit en plus deux hooks dans
 `~/.claude/settings.json`. Le premier met les règles de `no-ai-writing` dans le contexte de chaque
 session et de chaque sous-agent, sans attendre que le skill soit chargé. Le second recopie
-`~/AGENTS.md`, la source des règles globales, dans `~/.codex/AGENTS.md`, que lit Codex. Détails
+`~/AGENTS.md`, la source des règles globales, dans les fichiers globaux de Codex, Copilot CLI et
+Windsurf. Détails
 et désinstallation : [`hooks/README.md`](hooks/README.md).
 
 ## S’en servir

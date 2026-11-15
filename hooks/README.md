@@ -7,7 +7,7 @@ ne s’installent que sur demande : `./install.ps1 -Hooks` (Windows) ou `sh ins
 | Script | Lancé par | Ce qu’il fait |
 |---|---|---|
 | `always-on.mjs` | `SessionStart`, `SubagentStart` | met dans le contexte les passages « toujours actifs » des skills |
-| `sync-rules.mjs` | `SessionStart` | recopie `~/AGENTS.md` dans `~/.codex/AGENTS.md` |
+| `sync-rules.mjs` | `SessionStart` | recopie `~/AGENTS.md` dans les fichiers globaux de Codex, Copilot CLI et Windsurf |
 | `register.mjs` | `install.ps1 -Hooks` | inscrit les deux scripts dans `~/.claude/settings.json`, ou les en retire (`uninstall`) |
 
 ## Passages toujours actifs
@@ -62,20 +62,30 @@ Le contexte de `SessionStart` n’arrive pas aux sous-agents (constaté par le p
 issue #252) : `SubagentStart` le leur redonne. Un sous-agent de Claude Code reçoit déjà
 `CLAUDE.md`, la mémoire et la liste des skills ; c’est le texte des skills qui lui manque.
 
-## Règles recopiées pour Codex
+## Règles recopiées pour les autres agents
 
 `~/AGENTS.md` est la source des règles globales, pour tous les agents. `~/.claude/CLAUDE.md`
 l’importe par une ligne `@~/AGENTS.md` et ne garde que les règles propres à Claude Code. Claude
 Code ne charge alors `~/AGENTS.md` qu’une fois, même quand il le trouve aussi en remontant les
 dossiers parents (vérifié le 15 novembre 2026).
 
-Codex ne remonte pas jusqu’au dossier personnel depuis un dépôt git : il lit
-`~/.codex/AGENTS.md` (ou `$CODEX_HOME/AGENTS.md`). `sync-rules.mjs` y recopie `~/AGENTS.md` à
-chaque démarrage de session Claude Code, sans rien y changer. Sans `~/AGENTS.md`, il ne fait rien.
+Les autres agents ont chacun leur fichier global. `sync-rules.mjs` y recopie `~/AGENTS.md` à
+chaque démarrage de session Claude Code, sans rien y changer, et seulement pour les agents
+installés (ceux dont le dossier existe) :
 
-Le fichier généré commence par une marque. Sans elle, le fichier a été écrit à la main : le script
-ne l’écrase pas et le signale dans la session. `node hooks/sync-rules.mjs --force` le remplace
-après l’avoir copié dans `AGENTS.md.bak`. `--check` dit seulement si les deux fichiers diffèrent.
+| Agent | Fichier global |
+|---|---|
+| Codex | `~/.codex/AGENTS.md` (ou `$CODEX_HOME/AGENTS.md`) ; depuis un dépôt git, il ne remonte pas jusqu’au dossier personnel |
+| Copilot CLI | `~/.copilot/copilot-instructions.md` |
+| Windsurf | `~/.codeium/windsurf/memories/global_rules.md` |
+
+Cursor garde ses règles globales dans ses réglages, pas dans un fichier, et lit l’`AGENTS.md` du
+projet : il n’a pas de copie. Sans `~/AGENTS.md`, le script ne fait rien.
+
+Une copie générée commence par une marque. Un fichier non vide sans cette marque a été écrit à la
+main : le script ne l’écrase pas et le signale dans la session. `node hooks/sync-rules.mjs --force`
+le remplace après l’avoir copié à côté, avec l’extension `.bak`. `--check` dit seulement quelles
+copies diffèrent.
 
 Une règle de `~/AGENTS.md` parle de « l’assistant », ou nomme les agents qu’elle vise.
 
@@ -86,5 +96,5 @@ Une règle de `~/AGENTS.md` parle de « l’assistant », ou nomme les agents 
 - Toucher aux autres hooks de `settings.json` : `register.mjs` ne remplace que ceux dont la
   commande lance un script de ce dossier, et garde l’ancien fichier dans `settings.json.bak`.
 
-Codex a ses propres hooks ; ils ne sont pas branchés ici. Il reçoit les règles par `AGENTS.md`,
-mais pas les passages toujours actifs des skills.
+Codex, Copilot et Cursor ont leurs propres hooks ; ils ne sont pas branchés ici. Ces agents
+reçoivent les règles globales et les skills, mais pas les passages toujours actifs.

@@ -20,6 +20,11 @@ newline='
 '
 # Une cible par ligne, pour supporter les espaces dans les chemins.
 targets=${TARGETS:-"$HOME/.claude/skills$newline$HOME/.agents/skills"}
+# Windsurf ne lit que son propre dossier de skills : on l'alimente aussi, s'il est installé.
+# Copilot et Cursor lisent déjà ~/.claude/skills ou ~/.agents/skills.
+if [ -z "${TARGETS:-}" ] && [ -d "$HOME/.codeium/windsurf" ]; then
+  targets="$targets$newline$HOME/.codeium/windsurf/skills"
+fi
 problems=0
 hooks=0
 

@@ -82,8 +82,9 @@ script : `Get-ChildItem "$HOME\custom-skills" -Recurse | Unblock-File`.
 ## 3a. Installer pour toute la machine
 
 Lancer le script du clone. Il crée un **lien** par skill dans `~/.claude/skills` (Claude Code)
-et `~/.agents/skills` (Codex et les agents compatibles). Des liens, pas des copies : un
-`git pull` suffira ensuite à tout mettre à jour.
+et `~/.agents/skills` (Codex et les agents compatibles), et dans `~/.codeium/windsurf/skills` si
+Windsurf est installé. GitHub Copilot et Cursor lisent déjà l'un de ces dossiers. Des liens, pas
+des copies : un `git pull` suffira ensuite à tout mettre à jour.
 
 | Système | Tous les skills | Certains skills |
 |---|---|---|
@@ -126,10 +127,9 @@ Ne pas commiter dans le projet de l'utilisateur sans qu'il l'ait demandé.
 
 ## 3c. Autres agents
 
-Seulement si l'utilisateur se sert d'un agent qui ne lit ni `~/.claude/skills` ni
-`~/.agents/skills` (Cursor, Gemini CLI, Windsurf, Cline…) : le paquet npm `skills`
-(skills.sh, de Vercel) sait installer depuis GitHub, par copie, pour ces agents. C'est du code
-tiers : le proposer à l'utilisateur plutôt que le lancer d'office.
+Seulement si l'utilisateur se sert d'un agent qui ne lit aucun des dossiers de l'étape 3a : le
+paquet npm `skills` (skills.sh, de Vercel) sait installer depuis GitHub, par copie, pour ces
+agents. C'est du code tiers : le proposer à l'utilisateur plutôt que le lancer d'office.
 
 ```
 npx skills add pedrokarim/custom-skills
