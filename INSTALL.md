@@ -129,7 +129,7 @@ Ne pas commiter dans le projet de l'utilisateur sans qu'il l'ait demandé.
 
 Seulement si l'utilisateur se sert d'un agent qui ne lit aucun des dossiers de l'étape 3a : le
 paquet npm `skills` (skills.sh, de Vercel) sait installer depuis GitHub, par copie, pour ces
-agents. C'est du code tiers : le proposer à l'utilisateur plutôt que le lancer d'office.
+agents. C'est du code tiers : le proposer à l'utilisateur, sans le lancer d'office.
 
 ```
 npx skills add pedrokarim/custom-skills
