@@ -9,6 +9,7 @@
 #   ./install.sh                         tous les skills
 #   ./install.sh site-indexing           seulement ceux nommés
 #   TARGETS="$HOME/.claude/skills" ./install.sh
+#   ./install.sh --hooks                 inscrit aussi les hooks du dépôt (voir hooks/README.md)
 #
 # Relançable à volonté : crée les liens manquants, garde ceux qui sont bons, retire ceux qui
 # pointent vers un skill supprimé du dépôt, ne touche jamais à un dossier qui n'en vient pas.
@@ -20,11 +21,18 @@ newline='
 # Une cible par ligne, pour supporter les espaces dans les chemins.
 targets=${TARGETS:-"$HOME/.claude/skills$newline$HOME/.agents/skills"}
 problems=0
+hooks=0
 
 warn() {
   printf '  ! %s\n' "$1"
   problems=$((problems + 1))
 }
+
+# --hooks se retire de la liste des skills demandés.
+for arg in "$@"; do
+  shift
+  if [ "$arg" = "--hooks" ]; then hooks=1; else set -- "$@" "$arg"; fi
+done
 
 if [ $# -gt 0 ]; then
   requested=$(printf '%s\n' "$@")
@@ -93,6 +101,16 @@ for target in $targets; do
     esac
   done
 done
+
+if [ "$hooks" -eq 1 ]; then
+  printf '\nHooks (Claude Code)\n'
+  if ! command -v node >/dev/null 2>&1; then
+    warn "node introuvable : les hooks ont besoin de Node.js, rien n'est inscrit"
+  else
+    node "$repo/hooks/register.mjs" || warn "hooks non inscrits (voir le message ci-dessus)"
+    node "$repo/hooks/sync-rules.mjs" || warn "règles de Codex non recopiées (voir le message ci-dessus)"
+  fi
+fi
 
 if [ "$problems" -gt 0 ]; then
   printf '\n%s point(s) à corriger.\n' "$problems"

@@ -56,6 +56,14 @@ après avoir ajouté, renommé ou supprimé un skill ; il vérifie aussi l’en
 Pour les autres agents (Cursor, Gemini CLI…), `npx skills add pedrokarim/custom-skills`
 installe les skills par copie.
 
+### Avec les hooks (Claude Code)
+
+`./install.ps1 -Hooks` (ou `sh install.sh --hooks`) inscrit en plus deux hooks dans
+`~/.claude/settings.json`. Le premier met les règles de `no-ai-writing` dans le contexte de chaque
+session et de chaque sous-agent, sans attendre que le skill soit chargé. Le second recopie
+`~/.claude/CLAUDE.md` dans `~/.codex/AGENTS.md`, pour que Codex suive les mêmes règles. Détails
+et désinstallation : [`hooks/README.md`](hooks/README.md).
+
 ## S’en servir
 
 - **Sans rien dire** : l’agent propose un skill dès que la demande correspond à sa description.

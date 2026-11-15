@@ -24,6 +24,14 @@
 
 .EXAMPLE
     ./install.ps1 -Targets "$HOME\.claude\skills"
+
+.EXAMPLE
+    ./install.ps1 -Hooks
+
+    Inscrit aussi les hooks du dépôt dans ~/.claude/settings.json (voir hooks/README.md) et
+    recopie ~/.claude/CLAUDE.md dans ~/.codex/AGENTS.md. Une fois inscrits, ils restent : un
+    ./install.ps1 sans -Hooks ne les retire pas. Pour les retirer :
+    node hooks/register.mjs uninstall
 #>
 [CmdletBinding(PositionalBinding = $false)]
 param(
@@ -35,7 +43,10 @@ param(
     [string[]] $Targets = @(
         (Join-Path $HOME '.claude\skills'),
         (Join-Path $HOME '.agents\skills')
-    )
+    ),
+
+    # Inscrit aussi les hooks du dépôt (passages toujours actifs, règles recopiées pour Codex).
+    [switch] $Hooks
 )
 
 $ErrorActionPreference = 'Stop'
@@ -110,6 +121,19 @@ foreach ($target in $Targets) {
                 Write-Host "  - $($_.Name) (n'existe plus dans le dépôt)" -ForegroundColor DarkYellow
             }
         }
+}
+
+if ($Hooks) {
+    Write-Host "`nHooks (Claude Code)"
+    if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+        Write-Problem "node introuvable : les hooks ont besoin de Node.js, rien n'est inscrit"
+    }
+    else {
+        & node (Join-Path $repo 'hooks\register.mjs')
+        if ($LASTEXITCODE) { Write-Problem "hooks non inscrits (voir le message ci-dessus)" }
+        & node (Join-Path $repo 'hooks\sync-rules.mjs')
+        if ($LASTEXITCODE) { Write-Problem "règles de Codex non recopiées (voir le message ci-dessus)" }
+    }
 }
 
 if ($problemCount) {

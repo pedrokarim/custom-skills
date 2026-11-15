@@ -62,6 +62,22 @@ demande aucune modification.
    Un skill ajouté n'est proposé qu'à partir de la **session suivante**.
 8. Commiter et pousser (message en français, aucun co-auteur ni signature d'assistant).
 
+## Un passage toujours actif
+
+Une règle qui doit s’appliquer à chaque réponse, sans que l’agent pense à charger le skill, se
+place dans le `SKILL.md` entre `<!-- always-on: start -->` et `<!-- always-on: end -->`. Les
+hooks du dépôt (`./install.ps1 -Hooks`) l’injectent alors dans chaque session et chaque
+sous-agent. Le passage coûte ses jetons partout : n’y mettre que la règle et la liste courte,
+jamais les explications. `node hooks/always-on.mjs` montre ce qui serait injecté et sa taille.
+Tout est décrit dans `hooks/README.md`.
+
+## Les règles globales
+
+`~/.claude/CLAUDE.md` est la source des règles globales. Avec les hooks, chaque session Claude
+Code le recopie dans `~/.codex/AGENTS.md` ; ne jamais modifier ce dernier à la main, la
+modification serait perdue. Une règle qui vaut aussi pour Codex nomme les deux agents, ou dit
+« l’assistant ».
+
 ## Mettre à jour un skill
 
 Quand un piège nouveau apparaît en utilisant un skill, l'ajouter **dans le skill**, pas

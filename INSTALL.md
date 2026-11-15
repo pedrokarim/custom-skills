@@ -93,6 +93,9 @@ et `~/.agents/skills` (Codex et les agents compatibles). Des liens, pas des copi
 Sous Windows, sans `pwsh` (PowerShell 7), remplacer `pwsh` par `powershell` : le script
 fonctionne aussi avec Windows PowerShell 5.1.
 
+N'ajouter `-Hooks` (Windows) ou `--hooks` (macOS, Linux) que si l'utilisateur demande les hooks :
+ils écrivent dans `~/.claude/settings.json` et `~/.codex/AGENTS.md` (voir `hooks/README.md`).
+
 Lire la sortie, ligne par ligne :
 
 | Marque | Sens |

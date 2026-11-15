@@ -12,6 +12,7 @@ flou et plus gonflé, comme un portrait qu’on décrirait de plus en plus fort 
 s’efface. Presque tous les tics de ce skill en découlent, et la correction est presque toujours
 la même : remettre le fait précis, ou couper.
 
+<!-- always-on: start -->
 ## La règle
 
 Aucun tic du catalogue dans un texte livré, même un seul. Un lecteur entraîné décroche au
@@ -36,6 +37,7 @@ notes de version, textes d’interface (avec [`no-ai-slop`](../no-ai-slop/SKILL.
 de l’écran), réponse longue dans la conversation.
 
 Le code, les identifiants, les journaux, les données et les citations exactes restent tels quels.
+<!-- always-on: end -->
 
 ## Écrire
 
@@ -65,6 +67,7 @@ Ce qu’on rend : le texte corrigé. Une liste de ce qui a changé seulement si
 un fichier : relire tout le fichier, n’écrire que la prose, laisser intacts le code, les
 commandes, les chemins, les liens et l’en-tête YAML.
 
+<!-- always-on: start -->
 ## Le catalogue court
 
 Chaque ligne : le tic, puis ce qu’on écrit à la place. Le détail, avec un avant/après par tic,
@@ -184,6 +187,7 @@ corrigés dans [`assets/before-after.md`](assets/before-after.md).
     prix expire après 10 min ; il servait des prix de la veille. »
 
 <!-- tell-scan: on -->
+<!-- always-on: end -->
 
 ## Vérifier
 
