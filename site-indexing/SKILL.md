@@ -215,6 +215,13 @@ soit.
     « explorées, actuellement non indexées ». Lancer `seo_check.py page` sur **plusieurs**
     pages et comparer titre et canonical d'une page à l'autre : identiques, c'est ça. Le
     remède : un `layout.tsx` par page cliente, qui exporte ses métadonnées.
+    Variante plus discrète, vue sur le site d'origine : des pages serveur dont le
+    `generateMetadata` ne rend que `title` et `description`. Leur titre est juste, seul le
+    canonical (et les hreflang) vient du layout, donc comparer les titres ne suffit pas :
+    comparer les canonical. Dans l'inspection d'URL, la ligne « URL canonique déclarée par
+    l'utilisateur » qui montre l'accueil le confirme. Remède durable : ne poser aucun
+    `alternates` dans le layout racine, et une fonction qui construit canonical et hreflang
+    à partir du chemin, appelée par chaque page.
 19. **Croire qu'un `Disallow` du groupe `User-agent: *` vaut pour Google.** Un robot
     n'applique **que** le groupe qui le nomme : un groupe `User-agent: Googlebot` réduit à
     `Allow: /` annule pour lui tous les `Disallow` du groupe général. Lire le `robots.txt` en
@@ -225,6 +232,20 @@ soit.
     un `robots.txt` en 5xx n'est pas un « tout interdit » durable, `Claude-User` respecte bien
     `robots.txt`, et ce que Google écrit sur le rendu JavaScript est prudent (« may », « might »),
     pas catégorique. Citer la page de Google ou de l'éditeur, ou ne rien affirmer.
+
+21. **Des adresses sans préfixe de langue qui redirigent en 307.** Sur un site multilingue
+    (`/en/…`, `/fr/…`), le middleware de langue (next-intl par défaut) renvoie `/items/x` vers
+    `/en/items/x` ou `/fr/items/x` selon `Accept-Language`, en **307**. Une redirection
+    temporaire laisse l'adresse de départ candidate au rôle de canonique : sur le site
+    d'origine, Google a classé 35 fiches en « Page en double : Google n'a pas choisi la même
+    URL canonique que l'utilisateur », avec l'adresse **sans préfixe** comme canonique
+    retenue. Le motif se lit en ouvrant une URL du rapport dans l'inspection (ligne « URL
+    canonique sélectionnée par Google »). Vérifier ensuite que le site ne fait aucun lien
+    sans préfixe (`grep 'href="/'` sur le HTML servi, hors `/<locale>/`) et que le sitemap
+    n'en contient aucune ; si c'est propre, le motif date d'une ancienne exploration :
+    « Valider la correction » suffit à faire repasser Google. Un mail de la Search Console
+    sur un motif peut avoir des semaines : lire la date de dernière exploration des
+    exemples avant d'y chercher la cause d'un problème actuel.
 
 ## Ce que ce skill ne fait pas
 
