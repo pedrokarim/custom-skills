@@ -73,10 +73,11 @@ Tout est décrit dans `hooks/README.md`.
 
 ## Les règles globales
 
-`~/.claude/CLAUDE.md` est la source des règles globales. Avec les hooks, chaque session Claude
-Code le recopie dans `~/.codex/AGENTS.md` ; ne jamais modifier ce dernier à la main, la
-modification serait perdue. Une règle qui vaut aussi pour Codex nomme les deux agents, ou dit
-« l’assistant ».
+`~/AGENTS.md` est la source des règles globales, pour tous les agents. `~/.claude/CLAUDE.md`
+l’importe (`@~/AGENTS.md`) et ne garde que les règles propres à Claude Code, comme l’interdiction
+de l’outil Artifact. Avec les hooks, chaque session Claude Code recopie `~/AGENTS.md` dans
+`~/.codex/AGENTS.md` ; ne jamais modifier cette copie à la main, la modification serait perdue.
+Une règle de `~/AGENTS.md` parle de « l’assistant », ou nomme les agents qu’elle vise.
 
 ## Mettre à jour un skill
 

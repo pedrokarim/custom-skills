@@ -29,7 +29,7 @@
     ./install.ps1 -Hooks
 
     Inscrit aussi les hooks du dépôt dans ~/.claude/settings.json (voir hooks/README.md) et
-    recopie ~/.claude/CLAUDE.md dans ~/.codex/AGENTS.md. Une fois inscrits, ils restent : un
+    recopie ~/AGENTS.md dans ~/.codex/AGENTS.md. Une fois inscrits, ils restent : un
     ./install.ps1 sans -Hooks ne les retire pas. Pour les retirer :
     node hooks/register.mjs uninstall
 #>

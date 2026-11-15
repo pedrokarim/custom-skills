@@ -7,7 +7,7 @@ ne s’installent que sur demande : `./install.ps1 -Hooks` (Windows) ou `sh ins
 | Script | Lancé par | Ce qu’il fait |
 |---|---|---|
 | `always-on.mjs` | `SessionStart`, `SubagentStart` | met dans le contexte les passages « toujours actifs » des skills |
-| `sync-rules.mjs` | `SessionStart` | recopie `~/.claude/CLAUDE.md` dans `~/.codex/AGENTS.md` |
+| `sync-rules.mjs` | `SessionStart` | recopie `~/AGENTS.md` dans `~/.codex/AGENTS.md` |
 | `register.mjs` | `install.ps1 -Hooks` | inscrit les deux scripts dans `~/.claude/settings.json`, ou les en retire (`uninstall`) |
 
 ## Passages toujours actifs
@@ -64,16 +64,20 @@ issue #252) : `SubagentStart` le leur redonne. Un sous-agent de Claude Code re�
 
 ## Règles recopiées pour Codex
 
-Claude Code lit `~/.claude/CLAUDE.md`, Codex lit `~/.codex/AGENTS.md` (ou `$CODEX_HOME/AGENTS.md`).
-Tenus à la main, les deux finissent par dire des choses différentes. `CLAUDE.md` est la source ;
-`sync-rules.mjs` en fait `AGENTS.md`, à chaque démarrage de session Claude Code, et change un
-seul détail : `~/.claude/skills/` devient `~/.agents/skills/`.
+`~/AGENTS.md` est la source des règles globales, pour tous les agents. `~/.claude/CLAUDE.md`
+l’importe par une ligne `@~/AGENTS.md` et ne garde que les règles propres à Claude Code. Claude
+Code ne charge alors `~/AGENTS.md` qu’une fois, même quand il le trouve aussi en remontant les
+dossiers parents (vérifié le 15 novembre 2026).
+
+Codex ne remonte pas jusqu’au dossier personnel depuis un dépôt git : il lit
+`~/.codex/AGENTS.md` (ou `$CODEX_HOME/AGENTS.md`). `sync-rules.mjs` y recopie `~/AGENTS.md` à
+chaque démarrage de session Claude Code, sans rien y changer. Sans `~/AGENTS.md`, il ne fait rien.
 
 Le fichier généré commence par une marque. Sans elle, le fichier a été écrit à la main : le script
 ne l’écrase pas et le signale dans la session. `node hooks/sync-rules.mjs --force` le remplace
 après l’avoir copié dans `AGENTS.md.bak`. `--check` dit seulement si les deux fichiers diffèrent.
 
-Une règle qui vaut aussi pour Codex nomme les deux agents, ou dit « l’assistant ».
+Une règle de `~/AGENTS.md` parle de « l’assistant », ou nomme les agents qu’elle vise.
 
 ## Garde-fous
 

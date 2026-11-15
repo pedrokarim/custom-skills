@@ -61,7 +61,7 @@ installe les skills par copie.
 `./install.ps1 -Hooks` (ou `sh install.sh --hooks`) inscrit en plus deux hooks dans
 `~/.claude/settings.json`. Le premier met les règles de `no-ai-writing` dans le contexte de chaque
 session et de chaque sous-agent, sans attendre que le skill soit chargé. Le second recopie
-`~/.claude/CLAUDE.md` dans `~/.codex/AGENTS.md`, pour que Codex suive les mêmes règles. Détails
+`~/AGENTS.md`, la source des règles globales, dans `~/.codex/AGENTS.md`, que lit Codex. Détails
 et désinstallation : [`hooks/README.md`](hooks/README.md).
 
 ## S’en servir

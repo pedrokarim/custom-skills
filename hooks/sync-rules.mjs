@@ -1,6 +1,9 @@
 #!/usr/bin/env node
-// Recopie les règles globales de Claude Code (~/.claude/CLAUDE.md) dans celles de Codex
-// (~/.codex/AGENTS.md), pour qu'il n'y ait qu'un texte à écrire.
+// Recopie les règles globales communes (~/AGENTS.md) dans celles de Codex (~/.codex/AGENTS.md).
+//
+// ~/AGENTS.md est la source, pour tous les agents. Claude Code la lit par ~/.claude/CLAUDE.md, qui
+// l'importe (@~/AGENTS.md). Codex ne remonte pas jusqu'au dossier personnel depuis un dépôt git :
+// il lit ~/.codex/AGENTS.md, d'où cette copie.
 //
 //   node sync-rules.mjs           recopie si la cible manque ou a déjà été générée ici
 //   node sync-rules.mjs --check   dit seulement si la cible diffère (code 1 dans ce cas)
@@ -11,27 +14,25 @@
 //
 // Une cible écrite à la main n'est jamais écrasée sans --force : la première ligne générée
 // porte une marque, et seul un fichier qui l'a est réécrit d'office.
-//
-// Le seul changement apporté au texte : les chemins ~/.claude/skills/ deviennent
-// ~/.agents/skills/, le dossier où Codex trouve les mêmes skills.
 
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const MARK = '<!-- Généré depuis ~/.claude/CLAUDE.md par custom-skills/hooks/sync-rules.mjs. ' +
-  'Modifier la source : ce fichier est réécrit. -->';
+// Toute marque qui commence ainsi vient de ce script, y compris d'une version précédente.
+const MARK_PREFIX = '<!-- Généré depuis ~/';
+const MARK = MARK_PREFIX + 'AGENTS.md par custom-skills/hooks/sync-rules.mjs. ' +
+  'Modifier ~/AGENTS.md : ce fichier est réécrit. -->';
 
-const claudeDir = process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude');
 const codexDir = process.env.CODEX_HOME || join(homedir(), '.codex');
-const source = join(claudeDir, 'CLAUDE.md');
+const source = join(homedir(), 'AGENTS.md');
 const target = join(codexDir, 'AGENTS.md');
 
 export function render(sourceText) {
   const text = sourceText.replace(/^﻿/, '');
   const eol = text.includes('\r\n') ? '\r\n' : '\n';
-  return MARK + eol + eol + text.replaceAll('~/.claude/skills/', '~/.agents/skills/');
+  return MARK + eol + eol + text;
 }
 
 const args = new Set(process.argv.slice(2));
@@ -61,7 +62,7 @@ try {
     say(`${target} diffère de ${source}.`);
     process.exit(1);
   }
-  const handWritten = current !== null && !current.startsWith(MARK);
+  const handWritten = current !== null && !current.startsWith(MARK_PREFIX);
   if (handWritten && !args.has('--force')) {
     say(`${target} a été écrit à la main et diffère de ${source} : Codex ne suit donc pas les ` +
       `mêmes règles. Le signaler à l'utilisateur ; s'il est d'accord, lancer ` +
