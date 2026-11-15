@@ -46,6 +46,9 @@ function emit(text) {
 }
 
 const event = process.argv[2];
+// CUSTOM_SKILLS_ALWAYS_ON=0 coupe l'injection pour une session, par exemple pour mesurer ce
+// qu'elle change.
+if (process.env.CUSTOM_SKILLS_ALWAYS_ON === '0' && event) process.exit(0);
 try {
   const context = collectAlwaysOn();
   if (event === 'session-start') {

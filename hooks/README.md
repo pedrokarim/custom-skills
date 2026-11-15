@@ -32,7 +32,31 @@ tenir à jour. Les commentaires HTML du passage sont retirés avant l’injectio
 Chaque passage coûte des jetons dans chaque session et chaque sous-agent : celui de
 `no-ai-writing` fait 8 900 caractères, environ 3 000 jetons. Ne marquer que ce qui doit
 s’appliquer partout, sans qu’on y pense. Pour voir ce qui serait injecté et sa taille :
-`node hooks/always-on.mjs`.
+`node hooks/always-on.mjs`. `CUSTOM_SKILLS_ALWAYS_ON=0` coupe l’injection le temps d’une
+session.
+
+### Mesure du 15 novembre 2026
+
+Dix consignes d’écriture (commit, README, annonce Discord, post LinkedIn, e-mail à un client,
+notes de version, description de PR, « À propos », début de billet en anglais, état vide d’une
+page), trois essais chacune, Opus 5.5 en `claude -p`. Les tics sont comptés par `tell-scan`, sans
+la typographie.
+
+| Bras | Tics sur 30 textes | Textes sans tic | Coût moyen | Tours moyens |
+|---|--:|--:|--:|--:|
+| Claude Code nu (`--safe-mode`) | 157 | 6 | 0,030 $ | 1,0 |
+| Règle de `CLAUDE.md`, sans le hook | 3 | 28 | 0,202 $ | 3,4 |
+| Règle et hook | 0 | 30 | 0,136 $ | 1,0 |
+
+Sans rien, le modèle écrit un commit et un README propres. Les tics viennent de l’annonce
+Discord, du post LinkedIn, de l’e-mail et des notes de version : émojis, gras, séries de trois,
+« n’hésitez pas à », signatures à compléter. Sans le hook, l’agent charge le skill à chaque
+texte, d’où les tours en plus ; avec le hook, il écrit du premier coup et coûte un tiers de
+moins. Le bras nu n’a ni `CLAUDE.md`, ni MCP, ni liste de skills : son coût ne se compare pas
+aux deux autres.
+
+Limite : `tell-scan` compte les motifs que le catalogue apprend à éviter, la mesure favorise
+donc le skill par construction. Aucun lecteur ni juge à l’aveugle n’a comparé les textes.
 
 Le contexte de `SessionStart` n’arrive pas aux sous-agents (constaté par le projet ponytail,
 issue #252) : `SubagentStart` le leur redonne. Un sous-agent de Claude Code reçoit déjà
