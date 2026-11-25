@@ -9,6 +9,8 @@ Types :
   texture  une texture carrée raccordable sur ses quatre bords
   tileset  habille un gabarit de tuiles fourni en image (formes et grille gardées)
   strip    images successives d'une animation en boucle, sur une ligne
+  scene    une image de décor détaillée et finie (fond de jeu, niveau 16 bits), plans du fond
+           vers l'avant ; pour un décor minimaliste à aplats, voir le skill flat-pixel-art-scenes
 
 Exemples :
   python make_prompt.py sheet --out icons.txt --file icons.png --grid 4x4 --art 32 \\
@@ -16,6 +18,7 @@ Exemples :
   python make_prompt.py texture --out water.txt --file water.png --art 32 --theme "calm blue water"
   python make_prompt.py tileset --out grass.txt --file grass.png --surfaces "lush grass" "dry dirt"
   python make_prompt.py strip --out torch.txt --file torch.png --frames 6 --art 32 --theme "wall torch flame"
+  python make_prompt.py scene --out scene.txt --file scene.png --art 384 --colors 48 --crop 16:9       --theme "ruins of an ancient Egyptian site in the desert" --light "late afternoon, warm light"       --planes "sky;three far pyramids, pale and hazy;rolling dunes;ruined temple court with columns;sand floor with a dead bush"
 
 Les objets se donnent séparés par des points-virgules, dans l'ordre de lecture des cases.
 """
@@ -127,24 +130,67 @@ CANVAS (strict):
 {REFS.format(refs=args.refs) if args.refs else ""}"""
 
 
+def scene(args) -> str:
+    width, height = args.size, args.height or round(args.size * 2 / 3)
+    block = width // args.art
+    planes = [plane.strip() for plane in args.planes.split(";") if plane.strip()]
+    if not planes:
+        raise SystemExit("scene : donner les plans du fond vers l'avant avec --planes \"ciel;…;premier plan\".")
+    listed = "\n".join(f"{k + 1}. {plane}." for k, plane in enumerate(planes))
+    crop = ""
+    if args.crop:
+        cw, ch = (int(v) for v in args.crop.split(":"))
+        keep = round(width * ch / cw)
+        if keep < height:
+            margin = (height - keep) // 2
+            crop = f" The top {margin} and bottom {margin} pixels will be cropped to a {args.crop} frame, so keep every important element inside the central {width} x {keep} area."
+    light = f"\nLIGHT: {args.light}.\n" if args.light else ""
+    return f"""Generate ONE image file and save it as {args.file} in the current directory, using your image generation tool.
+
+WHAT TO DRAW: one finished, detailed pixel-art background for a 2D game: {args.theme}. A single still image, no layers, no text.
+
+CANVAS: {width} x {height} pixels.{crop}
+
+STYLE (most important):
+- Polished 16-bit era pixel art, as in a high-quality modern indie game background: dense hand-placed detail, readable shapes, rich shading.
+- Every art pixel is an exact {block} x {block} block of one flat color (the image is {args.art} x {height // block} art pixels). No blur, no anti-aliasing, no soft airbrush gradients: shading is done with clusters of flat pixel colors and light dithering.
+- Rich palette, about {args.colors} colors in total, in several ramps per material. Strong value contrast between planes.
+- Depth through atmospheric perspective: far planes paler and hazier with less contrast, near planes darker, sharper and more detailed.
+- Materials drawn piece by piece: visible blocks, cracks, chipped edges, worn corners, small debris where they meet the ground.
+{light}
+THE SCENE, far to near:
+{listed}
+
+AVOID: characters, animals, UI, frames, text, logos, a vignette, blurry painterly areas, a photographic look.
+{REFS.format(refs=args.refs) if args.refs else ""}"""
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("kind", choices=["sheet", "texture", "tileset", "strip"])
+    p.add_argument("kind", choices=["sheet", "texture", "tileset", "strip", "scene"])
     p.add_argument("--out", required=True, help="fichier de consigne écrit")
     p.add_argument("--file", required=True, help="nom de l'image que Codex doit écrire")
     p.add_argument("--theme", default="")
     p.add_argument("--items", default="", help="sheet : objets séparés par des points-virgules")
     p.add_argument("--grid", default="3x3", help="sheet : LIGNESxCOLONNES")
-    p.add_argument("--art", type=int, default=32, help="pixels d'art d'un objet (sheet, strip) ou de la texture")
+    p.add_argument("--art", type=int, help="pixels d'art d'un objet (sheet, strip : 32), de la texture, ou sur la largeur de la scène (scene : 384)")
     p.add_argument("--size", type=int, default=1536, help="largeur de l'image en pixels")
     p.add_argument("--view", choices=sorted(VIEWS), default="front")
     p.add_argument("--chroma", choices=sorted(CHROMA), default="green", help="magenta si les objets sont verts")
-    p.add_argument("--colors", type=int, default=16)
+    p.add_argument("--colors", type=int, help="couleurs demandées (16 ; scene : 48)")
+    p.add_argument("--height", type=int, help="scene : hauteur de l'image (par défaut les 2/3 de la largeur)")
+    p.add_argument("--planes", default="", help="scene : plans du fond vers l'avant, séparés par des points-virgules")
+    p.add_argument("--light", default="", help="scene : la lumière, en anglais")
+    p.add_argument("--crop", default="", help="scene : cadre final après recadrage, par exemple 16:9")
     p.add_argument("--surfaces", nargs="+", default=["grass"], help="tileset : une ou deux matières")
     p.add_argument("--frames", type=int, default=6, help="strip : nombre d'images")
     p.add_argument("--refs", default="", help="ce que montrent les images jointes, en anglais")
     args = p.parse_args()
-    text = {"sheet": sheet, "texture": texture, "tileset": tileset, "strip": strip}[args.kind](args)
+    if args.art is None:
+        args.art = 384 if args.kind == "scene" else 32
+    if args.colors is None:
+        args.colors = 48 if args.kind == "scene" else 16
+    text = {"sheet": sheet, "texture": texture, "tileset": tileset, "strip": strip, "scene": scene}[args.kind](args)
     Path(args.out).write_text(text.strip() + "\n", encoding="utf-8")
     print(f"{args.out} : {len(text)} caractères")
 

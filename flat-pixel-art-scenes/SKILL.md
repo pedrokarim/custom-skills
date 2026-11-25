@@ -1,6 +1,6 @@
 ---
 name: flat-pixel-art-scenes
-description: Produit des scènes en pixel art minimaliste à grands aplats, profondes et calmes, puis les anime en boucle (GIF ou fond de menu de jeu) – un générateur d'images pour l'image fixe, un script fourni pour l'animation. À utiliser dès qu'il est question de fond d'écran-titre ou de menu, de décor ou de paysage en pixel art, de « scène à plans superposés », de fond « avec de la profondeur », de GIF pixel art en boucle, ou de s'inspirer du style d'une image de référence pour créer un décor original ; même si la demande ne dit ni « pixel art » ni « animation », dès lors qu'il faut une illustration d'ambiance pour un jeu ou une page.
+description: Produit des scènes en pixel art minimaliste à grands aplats, profondes et calmes, puis les anime en boucle (GIF ou fond de menu de jeu) – un générateur d'images pour l'image fixe, un script fourni pour l'animation. À utiliser dès qu'il est question de fond d'écran-titre ou de menu, de décor ou de paysage en pixel art, de « scène à plans superposés », de fond « avec de la profondeur », de GIF pixel art en boucle, ou de s'inspirer du style d'une image de référence pour créer un décor original ; même si la demande ne dit ni « pixel art » ni « animation », dès lors qu'il faut une illustration d'ambiance pour un jeu ou une page. Seulement pour ce style à aplats : un fond de jeu détaillé (niveau 16 bits, pierres taillées, végétation dense, image de référence chargée) relève du skill `pixel-art-assets`, type `scene`.
 ---
 
 # Scènes pixel art à aplats, animées en boucle

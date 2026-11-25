@@ -1,6 +1,6 @@
 ---
 name: pixel-art-assets
-description: Fait dessiner par Codex (son outil de génération d'images) des assets de jeu en vrai pixel art, puis les ramène au pixel près par des scripts : planches d'objets, d'icônes, d'accessoires ou de personnages en grille 3×3 ou 4×4, tilesets de terrain qui se raccordent (15 pièces, double quadrillage), textures raccordables, textures animées en boucle (eau, lave, reflets), animations courtes sur une bande. Grille de pixels détectée, fond chroma retiré sans percer les objets, trous rebouchés, palette commune, contrôle des raccords. À utiliser dès qu'il faut des sprites, des icônes d'inventaire, des items, des props, du décor, un tileset, une texture ou une animation en pixel art pour un jeu, un site ou un bot, qu'on parle de SpriteCook, de « planche », de « grille d'items », de « faire générer par Codex », ou qu'une image générée « n'est pas du vrai pixel art », a des trous, un liseré vert ou une grille trop fine ; même si la demande ne dit pas « pixel art ».
+description: Fait dessiner par Codex (son outil de génération d'images) des assets de jeu en vrai pixel art, puis les ramène au pixel près par des scripts : planches d'objets, d'icônes, d'accessoires ou de personnages en grille 3×3 ou 4×4, tilesets de terrain qui se raccordent (15 pièces, double quadrillage), textures raccordables, textures animées en boucle (eau, lave, reflets), animations courtes sur une bande, fonds de jeu détaillés en une image (niveau 16 bits : pierres taillées, végétation, lumière, plusieurs plans). Grille de pixels détectée, fond chroma retiré sans percer les objets, trous rebouchés, palette commune, contrôle des raccords. À utiliser dès qu'il faut des sprites, des icônes d'inventaire, des items, des props, du décor, un fond ou un paysage de jeu détaillé (souvent avec une image de référence « au même niveau de détail »), un tileset, une texture ou une animation en pixel art pour un jeu, un site ou un bot, qu'on parle de SpriteCook, de « planche », de « grille d'items », de « faire générer par Codex », ou qu'une image générée « n'est pas du vrai pixel art », a des trous, un liseré vert ou une grille trop fine ; même si la demande ne dit pas « pixel art ».
 ---
 
 # Assets pixel art générés par Codex
@@ -14,7 +14,7 @@ Les scripts sont dans `scripts/` et ne demandent que Python 3 et Pillow. Chacun 
 
 | Script | Rôle |
 |---|---|
-| `make_prompt.py` | consigne Codex par type : `sheet`, `texture`, `tileset`, `strip` |
+| `make_prompt.py` | consigne Codex par type : `sheet`, `texture`, `tileset`, `strip`, `scene` |
 | `checkerboard.py` | damier de référence qui impose la taille d'un pixel d'art |
 | `generate.py` | lance `codex exec` avec la consigne et les images jointes, attend la fin |
 | `cut_sheet.py` | découpe une planche en sprites propres (grille, fond, liseré, trous, palette) |
@@ -56,6 +56,39 @@ Les scripts sont dans `scripts/` et ne demandent que Python 3 et Pillow. Chacun 
 
 Les gabarits de consigne, ce qu'ils exigent et pourquoi : `references/prompts.md`.
 
+## Un fond de jeu détaillé, en une image
+
+Le cas le plus courant pour un décor : une image fixe, finie, au niveau de détail d'un jeu 16 bits
+récent (blocs de pierre un par un, fissures, végétation, lumière, trois ou quatre plans dans la
+brume). Une seule génération, pas de calques, pas d'animation, sauf si on les demande.
+
+1. Fixer le niveau de détail avant de générer. Si l'utilisateur donne une image de référence,
+   la télécharger et la mesurer : nombre de couleurs, taille des blocs (`pixelize.py --detect`),
+   densité de détail. Ne jamais l'envoyer à Codex : la décrire par écrit, pour un résultat
+   original. Un mot comme « parallaxe », « fond » ou « simple » ne dit rien du niveau de détail ;
+   dans le doute, montrer une variante avant de bâtir quoi que ce soit autour.
+2. Consigne `scene` : style 16 bits imposé, blocs de 4 px, environ 48 couleurs, perspective
+   atmosphérique, plans listés du fond vers l'avant.
+   ```
+   python make_prompt.py scene --out scene.txt --file scene.png --art 384 --colors 48 --crop 16:9 \
+       --theme "ruins of an ancient Egyptian site in the desert" --light "late afternoon: warm golden light from the left" \
+       --planes "sky;three far pyramids, pale and hazy;rolling dunes;a ruined temple court with columns and a seated pharaoh statue;a sand floor with a dead bush" \
+       --refs "image 1 is a checkerboard whose squares are exactly one art pixel: draw on that pixel grid, never finer. Do not draw the checkerboard itself."
+   python checkerboard.py --out damier.png --art 384 --size 1536 --height 1024
+   python generate.py --prompt scene.txt --dir gen-a --expect scene.png --ref damier.png
+   ```
+   Lancer deux variantes à la fois (deux lumières, deux heures du jour), chacune dans son
+   dossier : elles tournent en parallèle, de deux à quatre minutes et de 28 000 à 46 000 tokens Codex chacune (quatre scènes
+   mesurées : désert et jungle, grille de 4 px tenue à chaque fois).
+3. Ramener à la grille avec le même nombre de couleurs que la consigne, puis recadrer :
+   `pixelize.py scene.png out.png --block 4 --colors 48`, puis garder les 216 rangées centrales
+   (384 × 216 en 16:9). À 48 couleurs, rien ne se perd : Codex en a dessiné 48.
+4. Regarder un détail agrandi ×4 au plus proche voisin (visage, branches, bord d'un bloc) :
+   chaque pixel d'art doit être un carré net.
+
+Exemple : `assets/example-scene-raw.png` (rendu Codex) et `assets/example-scene.png` (384 × 216,
+48 couleurs).
+
 ## Les autres types
 
 - Texture raccordable : `make_prompt.py texture`, puis `pixelize.py --block <taille>` et
@@ -72,7 +105,9 @@ Les gabarits de consigne, ce qu'ils exigent et pourquoi : `references/prompts.m
   chroma, avec un damier de la hauteur de la bande. Découper avec
   `cut_sheet.py --grid 1xN --keep-cell --gif 10` : les cases ne sont pas rognées, chaque image
   garde le même cadre et la partie fixe ne saute pas d'une image à l'autre.
-- Fond ou scène d'ambiance : voir le skill `flat-pixel-art-scenes`.
+- Fond minimaliste à grands aplats, calme, peu de couleurs, à animer en boucle : voir le skill
+  `flat-pixel-art-scenes`. Seulement si c'est ce style qu'on demande ; un fond de jeu sans
+  précision est un fond détaillé (section précédente).
 
 ## Erreurs déjà payées
 
@@ -95,14 +130,29 @@ Les gabarits de consigne, ce qu'ils exigent et pourquoi : `references/prompts.m
 - Détails plus fins que la grille. En habillant un gabarit, le modèle peint parfois de
   l'herbe au pixel près : `pixelize.py --block` les ramène à la grille du gabarit ; la détection
   automatique, elle, ne trouve rien de sensé sur une telle image (donner `--block`).
+- Un fond à aplats livré à qui voulait un fond détaillé. Pour un « fond en parallaxe » avec une
+  référence très détaillée en tête, la consigne a demandé des aplats et 6 couleurs par plan, et
+  tout un montage de calques a suivi : à jeter. Le niveau de détail se fixe d'abord (section
+  « Un fond de jeu détaillé »).
+- Le damier ignoré. Sur une consigne à grands aplats et peu de couleurs, Codex a dessiné des
+  blocs irréguliers de 11 à 13 px au lieu des 4 demandés, et `--detect` a rendu 21,25 px. Sur la
+  consigne `scene`, détaillée, il a tenu 4 px exactement. Si la détection rend une valeur non
+  entière, comparer deux `--block` à l'œil sur un détail agrandi.
+- Un accent froid fondu dans la palette. Un turquoise de quelques dizaines de pixels est devenu
+  moutarde à 20 couleurs, vert citron à 24 et 32 : la réduction le range avec les tons de sable.
+  Demander à Codex le nombre de couleurs voulu et réduire au même nombre ; sinon, rétablir
+  l'accent d'après la découpe sans réduction (`--colors 0`).
+- Un vert citron resté après `--no-chroma-hue`. Le liseré et l'accent turquoise ont formé ensemble
+  une entrée de palette (182, 207, 107), que la découpe garde. Dans un décor sans vert, chercher
+  après coup les pixels où le vert dépasse le rouge.
 
 ## Exemples
 
 Dans `assets/`, tous sortis de ce procédé sans retouche : `example-icons-raw.png` (la planche
 rendue par Codex) et `example-icons.png` (les seize sprites découpés en 32 × 32, palette
 commune), `example-tileset.png` et sa carte d'essai `example-tileset-map.png`,
-`example-water.gif` (une texture, animée par `texture.py`) et `example-torch.gif` (bande de six
-images).
+`example-water.gif` (une texture, animée par `texture.py`), `example-torch.gif` (bande de six
+images), `example-scene-raw.png` et `example-scene.png` (un fond détaillé, 384 × 216).
 
 ## D'où vient le procédé
 
