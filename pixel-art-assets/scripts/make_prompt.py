@@ -10,7 +10,8 @@ Types :
   tileset  habille un gabarit de tuiles fourni en image (formes et grille gardées)
   strip    images successives d'une animation en boucle, sur une ligne
   scene    une image de décor détaillée et finie (fond de jeu, niveau 16 bits), plans du fond
-           vers l'avant ; pour un décor minimaliste à aplats, voir le skill flat-pixel-art-scenes
+           vers l'avant, en plan large vu de face par défaut (--framing close pour un plan
+           rapproché) ; pour un décor minimaliste à aplats, voir le skill flat-pixel-art-scenes
 
 Exemples :
   python make_prompt.py sheet --out icons.txt --file icons.png --grid 4x4 --art 32 \\
@@ -130,6 +131,21 @@ CANVAS (strict):
 {REFS.format(refs=args.refs) if args.refs else ""}"""
 
 
+FRAMING = {
+    # Plan large vu de face : le cadrage d'un décor de jeu de plateforme, objets entiers et petits.
+    "wide": """FRAMING AND SCALE (strict, as important as the style):
+- Wide establishing shot of a 2D side-scrolling game level background: straight-on side view (elevation), camera far back, horizon at mid height, almost no perspective, no low angle, no high angle, no close-up.
+- The whole scene fits inside the frame with space around it. The main structure takes about one quarter of the image width and about half of its height; secondary structures are about one third of the image height; a person standing on the ground would be about one eighth of the image height.
+- Many small elements rather than a few big ones: several distinct structures side by side, each readable as a whole object, none cut by the frame except background trees and foreground plants.
+- Detail stays fine relative to the objects: individual stone blocks are 3 to 6 art pixels wide, carvings 2 to 4 art pixels, single leaves a few art pixels. Dark one-art-pixel outlines separate the objects from the background.
+- A horizontal ground or terrace runs across the lower third, like walkable ground; foreground plants stay small, along the bottom edge and the corners.
+
+""",
+    # Plan rapproché, perspective libre : de grands objets qui remplissent le cadre.
+    "close": "",
+}
+
+
 def scene(args) -> str:
     width, height = args.size, args.height or round(args.size * 2 / 3)
     block = width // args.art
@@ -151,7 +167,7 @@ WHAT TO DRAW: one finished, detailed pixel-art background for a 2D game: {args.t
 
 CANVAS: {width} x {height} pixels.{crop}
 
-STYLE (most important):
+{FRAMING[args.framing]}STYLE (most important):
 - Polished 16-bit era pixel art, as in a high-quality modern indie game background: dense hand-placed detail, readable shapes, rich shading.
 - Every art pixel is an exact {block} x {block} block of one flat color (the image is {args.art} x {height // block} art pixels). No blur, no anti-aliasing, no soft airbrush gradients: shading is done with clusters of flat pixel colors and light dithering.
 - Rich palette, about {args.colors} colors in total, in several ramps per material. Strong value contrast between planes.
@@ -182,6 +198,8 @@ def main() -> None:
     p.add_argument("--planes", default="", help="scene : plans du fond vers l'avant, séparés par des points-virgules")
     p.add_argument("--light", default="", help="scene : la lumière, en anglais")
     p.add_argument("--crop", default="", help="scene : cadre final après recadrage, par exemple 16:9")
+    p.add_argument("--framing", choices=sorted(FRAMING), default="wide",
+                   help="scene : wide = plan large vu de face, objets entiers et petits (décor de jeu) ; close = plan rapproché")
     p.add_argument("--surfaces", nargs="+", default=["grass"], help="tileset : une ou deux matières")
     p.add_argument("--frames", type=int, default=6, help="strip : nombre d'images")
     p.add_argument("--refs", default="", help="ce que montrent les images jointes, en anglais")

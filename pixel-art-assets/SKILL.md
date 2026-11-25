@@ -60,34 +60,38 @@ Les gabarits de consigne, ce qu'ils exigent et pourquoi : `references/prompts.m
 
 Le cas le plus courant pour un décor : une image fixe, finie, au niveau de détail d'un jeu 16 bits
 récent (blocs de pierre un par un, fissures, végétation, lumière, trois ou quatre plans dans la
-brume). Une seule génération, pas de calques, pas d'animation, sauf si on les demande.
+brume), cadrée comme le décor d'un jeu de plateforme. Une seule génération, pas de calques, pas
+d'animation, sauf si on les demande.
 
-1. Fixer le niveau de détail avant de générer. Si l'utilisateur donne une image de référence,
-   la télécharger et la mesurer : nombre de couleurs, taille des blocs (`pixelize.py --detect`),
-   densité de détail. Ne jamais l'envoyer à Codex : la décrire par écrit, pour un résultat
-   original. Un mot comme « parallaxe », « fond » ou « simple » ne dit rien du niveau de détail ;
-   dans le doute, montrer une variante avant de bâtir quoi que ce soit autour.
+1. Fixer le niveau de détail et le cadrage avant de générer. Si l'utilisateur donne une image
+   de référence, la télécharger et la mesurer : taille des blocs (`pixelize.py --detect`, ou à
+   l'œil sur un agrandissement), nombre de couleurs, et surtout la taille des objets par rapport
+   au cadre (le bâtiment principal fait-il un quart de la largeur ou toute la hauteur ?). Ne
+   jamais l'envoyer à Codex : la décrire par écrit, pour un résultat original. Un mot comme
+   « parallaxe », « fond » ou « simple » ne dit rien du niveau de détail ; dans le doute, montrer
+   une variante avant de bâtir quoi que ce soit autour.
 2. Consigne `scene` : style 16 bits imposé, blocs de 4 px, environ 48 couleurs, perspective
-   atmosphérique, plans listés du fond vers l'avant.
+   atmosphérique, plans listés du fond vers l'avant. Par défaut (`--framing wide`), plan large
+   vu de face, échelle chiffrée (bâtiment principal sur un quart de la largeur et la moitié de la
+   hauteur, un personnage sur un huitième), objets entiers et nombreux, sol horizontal dans le
+   tiers bas. `--framing close` seulement pour un plan rapproché voulu.
    ```
-   python make_prompt.py scene --out scene.txt --file scene.png --art 384 --colors 48 --crop 16:9 \
-       --theme "ruins of an ancient Egyptian site in the desert" --light "late afternoon: warm golden light from the left" \
-       --planes "sky;three far pyramids, pale and hazy;rolling dunes;a ruined temple court with columns and a seated pharaoh statue;a sand floor with a dead bush" \
-       --refs "image 1 is a checkerboard whose squares are exactly one art pixel: draw on that pixel grid, never finer. Do not draw the checkerboard itself."
+   python make_prompt.py scene --out scene.txt --file scene.png --art 384 --colors 48 --crop 16:9        --theme "an ancient temple complex in ruins inside a tropical rainforest"        --light "soft green daylight filtering through the canopy, gentle god rays from the upper left, light mist between the planes"        --planes "misty canopy and tall trunks in green haze;on the right, a mossy cliff with a waterfall split into three streams over stepped pools;the ruins side by side on stepped terraces: a small stepped shrine with a jaguar-head doorway, a row of pillars with a broken lintel, a toppled stele, a half-buried giant stone head;a long stone terrace across the lower third;foreground only along the bottom edge: small ferns and leaves"        --refs "image 1 is a checkerboard whose squares are exactly one art pixel: draw on that pixel grid, never finer. Do not draw the checkerboard itself."
    python checkerboard.py --out damier.png --art 384 --size 1536 --height 1024
    python generate.py --prompt scene.txt --dir gen-a --expect scene.png --ref damier.png
    ```
-   Lancer deux variantes à la fois (deux lumières, deux heures du jour), chacune dans son
-   dossier : elles tournent en parallèle, de deux à quatre minutes et de 28 000 à 46 000 tokens Codex chacune (quatre scènes
-   mesurées : désert et jungle, grille de 4 px tenue à chaque fois).
+   Lancer deux variantes à la fois (deux lumières, deux compositions), chacune dans son
+   dossier : elles tournent en parallèle, de deux à quatre minutes et de 28 000 à 46 000 tokens
+   Codex chacune (six scènes mesurées, désert et jungle, grille de 4 px tenue à chaque fois).
 3. Ramener à la grille avec le même nombre de couleurs que la consigne, puis recadrer :
    `pixelize.py scene.png out.png --block 4 --colors 48`, puis garder les 216 rangées centrales
    (384 × 216 en 16:9). À 48 couleurs, rien ne se perd : Codex en a dessiné 48.
 4. Regarder un détail agrandi ×4 au plus proche voisin (visage, branches, bord d'un bloc) :
-   chaque pixel d'art doit être un carré net.
+   chaque pixel d'art doit être un carré net. Puis l'image entière à côté de la référence, à la
+   même largeur : la taille des objets doit correspondre.
 
 Exemple : `assets/example-scene-raw.png` (rendu Codex) et `assets/example-scene.png` (384 × 216,
-48 couleurs).
+48 couleurs, plan large).
 
 ## Les autres types
 
@@ -145,6 +149,12 @@ Exemple : `assets/example-scene-raw.png` (rendu Codex) et `assets/example-scene
 - Un vert citron resté après `--no-chroma-hue`. Le liseré et l'accent turquoise ont formé ensemble
   une entrée de palette (182, 207, 107), que la découpe garde. Dans un décor sans vert, chercher
   après coup les pixels où le vert dépasse le rouge.
+- Des objets géants. Sans échelle écrite, la consigne `scene` a donné des plans rapprochés en
+  contre-plongée : colonnes sur toute la hauteur, statue qui remplit le cadre. La référence tenait un temple entier sur un quart de la largeur.
+  D'où le bloc de cadrage de `--framing wide`, avec des proportions chiffrées.
+- Une grille plus grosse refusée. Avec un damier de 6 px, Codex a quand même dessiné en 4 px ;
+  ramenée de force à 6 px, l'image perd ses détails. Garder 4 px et régler la taille des objets
+  par le cadrage.
 
 ## Exemples
 
@@ -152,7 +162,7 @@ Dans `assets/`, tous sortis de ce procédé sans retouche : `example-icons-raw.
 rendue par Codex) et `example-icons.png` (les seize sprites découpés en 32 × 32, palette
 commune), `example-tileset.png` et sa carte d'essai `example-tileset-map.png`,
 `example-water.gif` (une texture, animée par `texture.py`), `example-torch.gif` (bande de six
-images), `example-scene-raw.png` et `example-scene.png` (un fond détaillé, 384 × 216).
+images), `example-scene-raw.png` et `example-scene.png` (un fond détaillé en plan large, 384 × 216).
 
 ## D'où vient le procédé
 
